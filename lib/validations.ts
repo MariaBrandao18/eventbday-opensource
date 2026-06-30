@@ -47,6 +47,12 @@ export const reserveGiftSchema = z.object({
   token: z.string().min(1),
 })
 
+// Convidado adiciona, na área dele, o presente que vai levar (texto livre).
+export const addGuestGiftSchema = z.object({
+  description: z.string().min(2, 'Descreva o presente').max(200),
+  token: z.string().min(1),
+})
+
 export const voteSchema = z.object({
   poll_id: z.string().uuid(),
   option_id: z.string().uuid(),

@@ -2,10 +2,10 @@ import { notFound } from 'next/navigation'
 import { sql } from '@/lib/db'
 import { getEventBySlug, updateEventStatus, toggleEventSection, toggleSupplySuggestions, deleteEvent } from '@/actions/events'
 import { addGift, removeGift } from '@/actions/gifts'
-import { removeGuest } from '@/actions/guests'
 import { createPoll, closePoll, removePoll, getPollsForOrganizer } from '@/actions/polls'
 import { addSupply, removeSupply, listSuppliesForOrganizer } from '@/actions/supplies'
 import CopyButton from '@/components/CopyButton'
+import ConfirmedGuests from '@/components/ConfirmedGuests'
 import Link from 'next/link'
 
 const AV_COLORS = ['#E8553A','#E84C82','#F2A93B','#7A5AE0','#1F8A5B','#2A6FDB']
@@ -14,9 +14,6 @@ function avatarColor(name: string) {
   let h = 0
   for (const c of name) h = ((h * 31 + c.charCodeAt(0)) >>> 0)
   return AV_COLORS[h % AV_COLORS.length]
-}
-function initials(name: string) {
-  return name.trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase()
 }
 function coverGradient(seed: string) {
   const base = avatarColor(seed || 'x')
@@ -43,8 +40,8 @@ export default async function ManageEventPage({ params }: Props) {
   const ev = event
 
   const [guests, gifts, polls, supplies] = await Promise.all([
-    sql<{ id: string; name: string; email: string | null; status: string; companions: number; companion_names: string[]; is_public: boolean }[]>`
-      select id, name, email, status, companions, companion_names, is_public
+    sql<{ id: string; name: string; email: string | null; status: string; companions: number; companion_names: string[]; is_public: boolean; token: string; dietary_notes: string | null; created_at: string }[]>`
+      select id, name, email, status, companions, companion_names, is_public, token, dietary_notes, created_at
       from guests where event_id = ${event.id} order by created_at asc
     `,
     sql<{ id: string; description: string; status: string }[]>`
@@ -124,40 +121,11 @@ export default async function ManageEventPage({ params }: Props) {
             </div>
           </div>
 
-          {guests.filter(g => g.status === 'CONFIRMED').length > 0 && (
-            <div className="card pad">
-              <h2 className="section-title" style={{ fontSize: 16, marginBottom: 12 }}>Quem confirmou</h2>
-              <ul className="item-list">
-                {guests.filter(g => g.status === 'CONFIRMED').map(g => (
-                  <li key={g.id} className="item-row" style={{ alignItems: 'center' }}>
-                    <div className="av-sm" style={{ background: avatarColor(g.name), flexShrink: 0 }}>
-                      {initials(g.name)}
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <span className="item-name">{g.name}</span>
-                      {(g.companion_names?.length > 0) && (
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 6px', marginTop: 4 }}>
-                          {g.companion_names.map((cn, i) => (
-                            <span key={i} style={{ fontSize: 12, color: 'var(--ink-soft)', background: 'var(--surface-2)', borderRadius: 6, padding: '1px 7px' }}>
-                              {cn}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    {(g.companions ?? 0) > 0 && (
-                      <span className="muted" style={{ fontSize: 13, flexShrink: 0 }}>
-                        +{g.companions} acomp.
-                      </span>
-                    )}
-                    <form action={removeGuest.bind(null, g.id) as unknown as FA}>
-                      <button type="submit" className="row-del-btn" title="Remover convidado">×</button>
-                    </form>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+          <ConfirmedGuests
+            guests={guests.filter(g => g.status === 'CONFIRMED')}
+            baseUrl={baseUrl}
+            slug={event.slug}
+          />
 
           <div className="card pad">
             <h2 className="section-title" style={{ fontSize: 16, marginBottom: 14 }}>O que aparece no evento</h2>

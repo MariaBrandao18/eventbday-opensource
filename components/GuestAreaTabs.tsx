@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { reserveGift, cancelGiftReservation } from '@/actions/gifts'
+import { reserveGift, cancelGiftReservation, addGuestGift } from '@/actions/gifts'
 import { vote } from '@/actions/polls'
 import { signupForSupply, leaveSupply } from '@/actions/supplies'
 
@@ -10,6 +10,7 @@ interface Gift {
   description: string
   status: string
   reservedByMe: boolean
+  addedByMe: boolean
 }
 interface PollOption { id: string; text: string; votes?: number }
 interface Poll {
@@ -51,6 +52,7 @@ export default function GuestAreaTabs({ gifts, polls, supplies, token, showGifts
   const [, startTransition] = useTransition()
   const [pendingId, setPendingId] = useState<string | null>(null)
   const [feedback, setFeedback] = useState<{ msg: string; type: 'success' | 'error' } | null>(null)
+  const [newGift, setNewGift] = useState('')
 
   function flash(msg: string, type: 'success' | 'error' = 'success') {
     setFeedback({ msg, type })
@@ -73,6 +75,27 @@ export default function GuestAreaTabs({ gifts, polls, supplies, token, showGifts
           const res = await reserveGift(fd)
           if (res?.error) flash(res.error, 'error')
           else flash('Presente reservado! 🎁')
+        }
+      } finally {
+        setPendingId(null)
+      }
+    })
+  }
+
+  function handleAddGift() {
+    const description = newGift.trim()
+    if (pendingId !== null || description.length < 2) return
+    setPendingId('add-gift')
+    startTransition(async () => {
+      try {
+        const fd = new FormData()
+        fd.set('description', description)
+        fd.set('token', token)
+        const res = await addGuestGift(fd)
+        if (res?.error) flash(res.error, 'error')
+        else {
+          setNewGift('')
+          flash('Presente adicionado! 🎁')
         }
       } finally {
         setPendingId(null)
@@ -142,8 +165,27 @@ export default function GuestAreaTabs({ gifts, polls, supplies, token, showGifts
       {/* PRESENTES */}
       {activeTab === 'gifts' && (
         <div className="tab-panel">
+          <div className="add-gift-bar">
+            <input
+              type="text"
+              placeholder="Vou levar..."
+              value={newGift}
+              maxLength={200}
+              disabled={pendingId === 'add-gift'}
+              onChange={e => setNewGift(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleAddGift()}
+            />
+            <button
+              className="btn sm"
+              disabled={pendingId === 'add-gift' || newGift.trim().length < 2}
+              onClick={handleAddGift}
+            >
+              {pendingId === 'add-gift' ? '...' : 'Adicionar'}
+            </button>
+          </div>
+
           {gifts.length === 0 ? (
-            <p className="empty-hint">Nenhum presente na lista.</p>
+            <p className="empty-hint">Nenhum presente na lista ainda. Adicione o que você vai levar acima.</p>
           ) : (
             <ul className="gift-list">
               {gifts.map(g => (
@@ -162,7 +204,7 @@ export default function GuestAreaTabs({ gifts, polls, supplies, token, showGifts
                         disabled={pendingId === g.id}
                         onClick={() => handleReserve(g.id, g.reservedByMe)}
                       >
-                        {pendingId === g.id ? '...' : g.reservedByMe ? 'Cancelar' : 'Reservar'}
+                        {pendingId === g.id ? '...' : g.reservedByMe ? (g.addedByMe ? 'Remover' : 'Cancelar') : 'Reservar'}
                       </button>
                     )}
                   </div>
@@ -239,34 +281,45 @@ export default function GuestAreaTabs({ gifts, polls, supplies, token, showGifts
           {supplies.length === 0 ? (
             <p className="empty-hint">Nenhum insumo listado.</p>
           ) : (
-            <ul className="supply-list">
-              {supplies.map(s => {
-                const full = s.signedCount >= s.quantity
-                return (
-                  <li key={s.id} className={`supply${s.signedByMe ? ' mine' : ''}`}>
-                    <div className="supply-info">
-                      <span className="supply-name">{s.name}</span>
-                      <span className="supply-progress">
-                        {s.signedCount}/{s.quantity}
-                        {full && !s.signedByMe && <span className="supply-full"> · completo</span>}
-                      </span>
-                    </div>
-                    <div className="supply-bar-wrap">
-                      <div className="supply-bar">
-                        <div className="supply-fill" style={{ width: `${Math.min(100, (s.signedCount / s.quantity) * 100)}%` }} />
+            <>
+              <p className="supply-intro">
+                Estes são itens que ajudam o evento a acontecer. Escolha o que você puder levar.
+              </p>
+              <ul className="supply-list">
+                {supplies.map(s => {
+                  const full = s.signedCount >= s.quantity
+                  const remaining = Math.max(0, s.quantity - s.signedCount)
+                  const pct = Math.min(100, (s.signedCount / s.quantity) * 100)
+                  let statusText: string
+                  if (s.signedByMe) statusText = 'Você vai levar 🎉'
+                  else if (full) statusText = 'Já tem quem leve ✓'
+                  else if (s.quantity === 1) statusText = 'Ninguém levou ainda'
+                  else statusText = `Faltam ${remaining} de ${s.quantity}`
+                  return (
+                    <li key={s.id} className={`supply${s.signedByMe ? ' mine' : ''}`}>
+                      <div className="supply-info">
+                        <span className="supply-name">{s.name}</span>
+                        <span className={`supply-progress${s.signedByMe ? ' is-mine' : full ? ' is-full' : ''}`}>
+                          {statusText}
+                        </span>
                       </div>
-                    </div>
-                    <button
-                      className={`btn sm${s.signedByMe ? ' secondary' : full ? ' ghost' : ''}`}
-                      disabled={pendingId === s.id || (full && !s.signedByMe)}
-                      onClick={() => handleSupply(s.id, s.signedByMe)}
-                    >
-                      {pendingId === s.id ? '...' : s.signedByMe ? 'Sair' : full ? 'Completo' : 'Participar'}
-                    </button>
-                  </li>
-                )
-              })}
-            </ul>
+                      <button
+                        className={`btn sm${s.signedByMe ? ' secondary' : full ? ' ghost' : ''}`}
+                        disabled={pendingId === s.id || (full && !s.signedByMe)}
+                        onClick={() => handleSupply(s.id, s.signedByMe)}
+                      >
+                        {pendingId === s.id ? '...' : s.signedByMe ? 'Não vou levar' : full ? 'Completo' : 'Vou levar'}
+                      </button>
+                      <div className="supply-bar-wrap">
+                        <div className="supply-bar">
+                          <div className="supply-fill" style={{ width: `${pct}%` }} />
+                        </div>
+                      </div>
+                    </li>
+                  )
+                })}
+              </ul>
+            </>
           )}
         </div>
       )}

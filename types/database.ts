@@ -43,6 +43,8 @@ export interface GiftPublic {
   description: string
   status: GiftStatus
   reservedByMe?: boolean
+  /** true quando foi o próprio convidado quem adicionou este presente. */
+  addedByMe?: boolean
 }
 
 export interface Poll {
