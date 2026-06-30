@@ -168,8 +168,6 @@ scripts/migrate.mjs          → Runner de migrations
 | `polls` / `poll_options` / `poll_votes` | Enquetes com visibilidade configurável |
 | `supplies` / `supply_signups` | Lista de insumos e inscrições |
 
-Não existem as tabelas `profiles`, `email_logs` nem `audit_logs` — não há contas de
-usuário nem envio de e-mail nesta camada.
 
 ## 🔐 Decisões de segurança e privacidade
 
