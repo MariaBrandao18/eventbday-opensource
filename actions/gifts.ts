@@ -2,7 +2,7 @@
 
 import { sql } from '@/lib/db'
 import { isAdmin } from '@/lib/admin-auth'
-import { reserveGiftSchema } from '@/lib/validations'
+import { reserveGiftSchema, addGuestGiftSchema } from '@/lib/validations'
 import { revalidatePath } from 'next/cache'
 import type { GiftPublic } from '@/types/database'
 
@@ -54,16 +54,47 @@ export async function removeGift(giftId: string) {
 export async function listGifts(eventId: string, token: string): Promise<GiftPublic[]> {
   const myGuestId = await guestIdFromToken(token, eventId)
 
-  const gifts = await sql<{ id: string; event_id: string; description: string; status: string; guest_id: string | null }[]>`
-    select id, event_id, description, status, guest_id
+  const gifts = await sql<{ id: string; event_id: string; description: string; status: string; guest_id: string | null; created_by_guest_id: string | null }[]>`
+    select id, event_id, description, status, guest_id, created_by_guest_id
     from gifts where event_id = ${eventId}
     order by created_at asc
   `
 
-  return gifts.map(({ guest_id, ...gift }) => ({
-    ...(gift as Omit<GiftPublic, 'reservedByMe'>),
+  return gifts.map(({ guest_id, created_by_guest_id, ...gift }) => ({
+    ...(gift as Omit<GiftPublic, 'reservedByMe' | 'addedByMe'>),
     reservedByMe: myGuestId ? guest_id === myGuestId : false,
+    addedByMe: myGuestId ? created_by_guest_id === myGuestId : false,
   }))
+}
+
+/**
+ * Convidado adiciona o presente que ele mesmo vai levar. O item já
+ * nasce RESERVED em nome dele. guest_id e created_by_guest_id são
+ * internos — NUNCA saem desta Server Action (regra de anonimato).
+ */
+export async function addGuestGift(formData: FormData) {
+  const raw = { description: formData.get('description'), token: formData.get('token') }
+  const parsed = addGuestGiftSchema.safeParse(raw)
+  if (!parsed.success) {
+    return { error: parsed.error.errors[0]?.message ?? 'Dados inválidos', code: 'VALIDATION_ERROR' }
+  }
+
+  // Sem event_id no client: resolvemos evento + guest a partir do token.
+  const [guest] = await sql<{ id: string; event_id: string }[]>`
+    select id, event_id from guests
+    where token = ${parsed.data.token} and status = 'CONFIRMED'
+    limit 1
+  `
+  if (!guest) return { error: 'Você não é convidado confirmado deste evento', code: 'FORBIDDEN' }
+
+  await sql`
+    insert into gifts (event_id, description, status, guest_id, created_by_guest_id)
+    values (${guest.event_id}, ${parsed.data.description}, 'RESERVED', ${guest.id}, ${guest.id})
+  `
+
+  const [event] = await sql<{ slug: string }[]>`select slug from events where id = ${guest.event_id} limit 1`
+  if (event) revalidatePath(`/e/${event.slug}/guest`)
+  return { success: true }
 }
 
 export async function reserveGift(formData: FormData) {
@@ -99,15 +130,21 @@ export async function reserveGift(formData: FormData) {
 }
 
 export async function cancelGiftReservation(giftId: string, token: string) {
-  const [gift] = await sql<{ id: string; guest_id: string | null; event_id: string }[]>`
-    select id, guest_id, event_id from gifts where id = ${giftId} limit 1
+  const [gift] = await sql<{ id: string; guest_id: string | null; created_by_guest_id: string | null; event_id: string }[]>`
+    select id, guest_id, created_by_guest_id, event_id from gifts where id = ${giftId} limit 1
   `
   if (!gift) return { error: 'Presente não encontrado', code: 'NOT_FOUND' }
 
   const myGuestId = await guestIdFromToken(token, gift.event_id)
   if (!myGuestId || gift.guest_id !== myGuestId) return { error: 'Sem permissão', code: 'FORBIDDEN' }
 
-  await sql`update gifts set status = 'AVAILABLE', guest_id = null where id = ${giftId}`
+  if (gift.created_by_guest_id === myGuestId) {
+    // Presente adicionado pelo próprio convidado: remove em vez de liberar,
+    // para não deixar item órfão na lista do organizador.
+    await sql`delete from gifts where id = ${giftId}`
+  } else {
+    await sql`update gifts set status = 'AVAILABLE', guest_id = null where id = ${giftId}`
+  }
 
   const [event] = await sql<{ slug: string }[]>`select slug from events where id = ${gift.event_id} limit 1`
   if (event) revalidatePath(`/e/${event.slug}/guest`)
