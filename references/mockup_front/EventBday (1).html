@@ -1,0 +1,2321 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EventBday — Aniversário da Maria</title>
+<template id="__bundler_thumbnail" data-bg-color="#FFFBF7">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#FFFBF7"/>
+    <rect x="470" y="300" width="260" height="150" rx="20" fill="#E8553A"/>
+    <rect x="560" y="250" width="80" height="60" rx="10" fill="#F2A93B"/>
+    <circle cx="600" cy="235" r="14" fill="#E84C82"/>
+    <rect x="500" y="500" width="200" height="22" rx="11" fill="#E5D2C2"/>
+    <rect x="540" y="540" width="120" height="18" rx="9" fill="#F0E2D5"/>
+  </svg>
+</template>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Unbounded:wght@400..700&family=Space+Grotesk:wght@400..700&display=swap" rel="stylesheet" />
+<style>
+/* ─────────────────────────────────────────────────────────────
+   EventBday — tokens
+   Tweakable values live on :root and are overwritten at runtime.
+   ───────────────────────────────────────────────────────────── */
+:root{
+  --bg:#FFFBF7;
+  --surface:#ffffff;
+  --surface-2:#FFF4EC;
+  --ink:#2A1B12;
+  --ink-soft:#7A675B;
+  --ink-faint:#A89488;
+  --line:#F0E2D5;
+  --line-strong:#E5D2C2;
+
+  /* festive warm trio */
+  --coral:#E8553A;
+  --amber:#F2A93B;
+  --pink:#E84C82;
+
+  /* tweakable */
+  --accent:#E8553A;
+  --accent-ink:#ffffff;
+  --radius:18px;
+  --radius-sm:12px;
+  --radius-pill:999px;
+  --title-font:"Bricolage Grotesque";
+
+  --shadow-sm:0 1px 2px rgba(74,40,20,.06), 0 2px 8px rgba(74,40,20,.05);
+  --shadow-md:0 6px 22px rgba(74,40,20,.10), 0 2px 6px rgba(74,40,20,.06);
+  --shadow-lg:0 18px 50px rgba(74,40,20,.16);
+  --maxw:1080px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"Plus Jakarta Sans",system-ui,sans-serif;
+  font-size:16px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  min-height:100vh;
+}
+h1,h2,h3,h4,.display{font-family:var(--title-font),"Bricolage Grotesque",system-ui,sans-serif;}
+h1,h2,h3{margin:0;line-height:1.05;letter-spacing:-.01em;}
+p{margin:0;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;}
+input,select{font-family:inherit;font-size:15px;color:var(--ink);}
+a{color:inherit;}
+::selection{background:color-mix(in oklch,var(--accent),transparent 70%);}
+
+/* ── Top navbar ───────────────────────────────────────────── */
+.topbar{
+  position:sticky;top:0;z-index:50;
+  background:color-mix(in oklch,var(--surface),transparent 8%);
+  backdrop-filter:saturate(1.2) blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.topbar-inner{
+  max-width:var(--maxw);margin:0 auto;padding:0 24px;height:66px;
+  display:flex;align-items:center;gap:22px;
+}
+.brand{display:flex;align-items:center;gap:11px;margin-right:auto;cursor:pointer;}
+.brand-mark{
+  width:36px;height:36px;border-radius:calc(var(--radius-sm) - 2px);
+  background:var(--accent);position:relative;flex:none;
+  display:grid;place-items:center;color:var(--accent-ink);
+  box-shadow:var(--shadow-sm);
+}
+.brand-mark svg{width:21px;height:21px;}
+.brand-name{font-family:var(--title-font);font-weight:700;font-size:20px;letter-spacing:-.02em;}
+.brand-name b{color:var(--accent);}
+.nav-links{display:flex;align-items:center;gap:4px;}
+.nav-link{
+  padding:9px 15px;border-radius:var(--radius-pill);font-size:14.5px;font-weight:600;
+  color:var(--ink-soft);transition:background .15s,color .15s;white-space:nowrap;
+}
+.nav-link:hover{background:var(--surface-2);color:var(--ink);}
+.nav-link.active{background:var(--accent);color:var(--accent-ink);}
+.nav-link.admin{margin-left:6px;border:1.5px solid var(--line-strong);color:var(--ink);}
+.nav-link.admin.active{border-color:var(--accent);}
+
+/* layout da navbar centrada no usuário */
+.brand{margin-right:24px;}
+.nav-links{margin-right:auto;}
+
+/* ── Conta (avatar + menu) ────────────────────────────────── */
+.avatar{
+  width:34px;height:34px;border-radius:50%;flex:none;
+  display:grid;place-items:center;color:#fff;font-weight:800;font-size:13px;
+  letter-spacing:.01em;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.25);
+}
+.account{position:relative;}
+.account-btn{
+  display:flex;align-items:center;gap:9px;padding:5px 10px 5px 5px;
+  border-radius:var(--radius-pill);border:1.5px solid var(--line);
+  background:var(--surface);transition:border-color .15s,box-shadow .15s;
+}
+.account-btn:hover{border-color:var(--line-strong);box-shadow:var(--shadow-sm);}
+.account.open .account-btn{border-color:var(--accent);}
+.account-av{width:30px;height:30px;font-size:12px;}
+.account-name{font-weight:700;font-size:14.5px;}
+.account-caret{width:15px;height:15px;color:var(--ink-faint);transition:transform .2s;}
+.account.open .account-caret{transform:rotate(180deg);}
+.account-menu{
+  position:absolute;top:calc(100% + 10px);right:0;width:260px;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow-lg);padding:8px;opacity:0;visibility:hidden;
+  transform:translateY(-6px) scale(.98);transform-origin:top right;
+  transition:opacity .16s,transform .16s,visibility .16s;z-index:60;
+}
+.account.open .account-menu{opacity:1;visibility:visible;transform:none;}
+.account-menu-head{display:flex;align-items:center;gap:11px;padding:10px 10px 12px;border-bottom:1px solid var(--line);margin-bottom:6px;}
+.amh-text{min-width:0;}
+.amh-name{font-weight:800;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.amh-email{font-size:12.5px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.account-menu-item{
+  display:flex;align-items:center;gap:11px;width:100%;padding:10px 12px;
+  border-radius:var(--radius-sm);font-size:14px;font-weight:600;color:var(--ink);
+  transition:background .14s;text-align:left;
+}
+.account-menu-item svg{width:18px;height:18px;color:var(--ink-soft);}
+.account-menu-item:hover{background:var(--surface-2);}
+.account-menu-item.danger{color:#C53D2E;}
+.account-menu-item.danger svg{color:#C53D2E;}
+.account-menu-item.danger:hover{background:color-mix(in oklch,#C53D2E,transparent 92%);}
+
+/* ── Tela de login / cadastro ─────────────────────────────── */
+body.is-login{overflow:hidden;}
+.login-screen{display:none;min-height:100vh;}
+.login-screen.screen.active{display:grid;grid-template-columns:1.05fr .95fr;animation:none;}
+.login-art{
+  position:relative;overflow:hidden;color:#fff;
+  background:linear-gradient(150deg,#E8553A 0%,#E84C82 56%,#F2A93B 116%);
+  display:flex;align-items:center;padding:54px;
+}
+.login-art-confetti{position:absolute;inset:0;pointer-events:none;}
+.login-art-confetti i{position:absolute;display:block;border-radius:2px;opacity:.7;}
+.login-art-inner{position:relative;z-index:2;max-width:440px;}
+.login-brand{display:flex;align-items:center;gap:12px;margin-bottom:46px;}
+.login-brand .brand-mark{background:rgba(255,255,255,.16);color:#fff;width:42px;height:42px;box-shadow:none;backdrop-filter:blur(4px);}
+.login-brand .brand-mark.lg svg{width:24px;height:24px;}
+.login-brand-name{font-family:var(--title-font);font-weight:700;font-size:22px;color:#fff;}
+.login-brand-name b{color:#fff;}
+.login-art-title{font-size:43px;line-height:1.04;letter-spacing:-.02em;margin-bottom:20px;font-weight:800;}
+.login-art-sub{font-size:17px;line-height:1.5;color:rgba(255,255,255,.92);margin-bottom:30px;max-width:400px;}
+.login-art-points{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:14px;}
+.login-art-points li{display:flex;align-items:center;gap:12px;font-size:15.5px;font-weight:600;color:rgba(255,255,255,.96);}
+.lap-dot{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.2);flex:none;position:relative;}
+.lap-dot::after{content:"";position:absolute;inset:0;margin:auto;width:7px;height:7px;border-radius:50%;background:#fff;}
+.login-pane{display:flex;align-items:center;justify-content:center;padding:40px;background:var(--bg);overflow-y:auto;}
+.login-card{width:100%;max-width:392px;}
+.login-tabs{display:flex;gap:6px;padding:5px;background:var(--surface-2);border-radius:var(--radius-pill);margin-bottom:30px;}
+.login-tab{flex:1;padding:11px;border-radius:var(--radius-pill);font-weight:700;font-size:14.5px;color:var(--ink-soft);transition:.15s;}
+.login-tab.active{background:var(--surface);color:var(--ink);box-shadow:var(--shadow-sm);}
+.login-title{font-size:30px;font-weight:800;letter-spacing:-.02em;margin-bottom:8px;}
+.login-lede{color:var(--ink-soft);font-size:15.5px;margin-bottom:26px;}
+.login-form{display:flex;flex-direction:column;}
+.login-demo{margin-top:22px;font-size:12.5px;color:var(--ink-faint);text-align:center;line-height:1.5;}
+.btn.full{width:100%;justify-content:center;}
+
+/* ── Banner de pré-visualização ───────────────────────────── */
+.preview-banner{display:none;position:sticky;top:66px;z-index:45;
+  background:#2A1B12;color:#fff;}
+.preview-banner.show{display:block;}
+.preview-banner-inner{
+  max-width:var(--maxw);margin:0 auto;padding:11px 24px;
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+}
+.pb-tag{display:inline-flex;align-items:center;gap:7px;font-weight:800;font-size:12.5px;
+  letter-spacing:.04em;text-transform:uppercase;color:var(--amber);}
+.pb-tag svg{width:16px;height:16px;}
+.pb-text{font-size:14px;color:rgba(255,255,255,.85);}
+.pb-text b{color:#fff;}
+.pb-back{margin-left:auto;font-weight:700;font-size:13.5px;color:#fff;
+  padding:7px 14px;border-radius:var(--radius-pill);background:rgba(255,255,255,.12);transition:background .15s;}
+.pb-back:hover{background:rgba(255,255,255,.22);}
+
+/* ── Home: cabeçalho + seções ─────────────────────────────── */
+.home-head{margin-bottom:36px;}
+.home-greeting{font-size:38px;font-weight:800;letter-spacing:-.025em;margin-bottom:6px;}
+.home-greeting-sub{font-size:16px;}
+.home-section{margin-bottom:46px;}
+.home-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px;}
+.home-section-title{font-size:23px;font-weight:800;letter-spacing:-.02em;}
+.home-section-sub{font-size:14px;color:var(--ink-soft);margin-top:2px;}
+.home-empty{font-size:14.5px;line-height:1.55;}
+
+/* etiqueta de papel nos cartões */
+.ev-role-tag{position:absolute;top:12px;left:12px;z-index:2;
+  font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
+  padding:5px 10px;border-radius:var(--radius-pill);backdrop-filter:blur(6px);}
+.ev-role-tag.organizer{background:rgba(255,255,255,.92);color:var(--accent);}
+.ev-pending{margin-left:8px;font-size:11.5px;font-weight:700;color:#B8761A;
+  background:#FDF0DC;padding:2px 9px;border-radius:var(--radius-pill);}
+
+/* ── Cartões de convite recebido ──────────────────────────── */
+.inv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(440px,1fr));gap:18px;}
+.inv-card{display:flex;gap:0;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);
+  transition:box-shadow .18s,transform .18s,border-color .18s;cursor:pointer;}
+.inv-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);border-color:var(--line-strong);}
+.inv-card.pending{border-color:color-mix(in oklch,var(--amber),transparent 55%);}
+.inv-cover{width:104px;flex:none;display:grid;place-items:center;}
+.inv-emoji{font-size:42px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.18));}
+.inv-body{flex:1;min-width:0;padding:16px 18px 16px 18px;display:flex;flex-direction:column;gap:9px;}
+.inv-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+.inv-host{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--ink-soft);margin-top:4px;}
+.inv-host-av{width:21px;height:21px;font-size:9.5px;}
+.inv-host b{color:var(--ink);}
+.inv-status{font-size:11.5px;font-weight:800;letter-spacing:.03em;padding:5px 11px;border-radius:var(--radius-pill);
+  white-space:nowrap;display:inline-flex;align-items:center;gap:5px;flex:none;}
+.inv-status svg{width:13px;height:13px;}
+.inv-status.confirmed{background:#E3F4EA;color:#1F8A5B;}
+.inv-status.pending{background:#FDF0DC;color:#B8761A;}
+.inv-status.declined{background:#F3E7E4;color:#B5564A;}
+.inv-meta{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13.5px;color:var(--ink-soft);}
+.inv-meta span{display:inline-flex;align-items:center;gap:6px;}
+.inv-meta svg{width:15px;height:15px;flex:none;}
+.inv-note{font-size:13px;color:#1F8A5B;font-weight:600;}
+.inv-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:auto;padding-top:4px;}
+.manage-head-actions{display:flex;gap:10px;align-items:center;}
+.btn.ghost.danger-ghost{color:#C53D2E;}
+.btn.ghost.danger-ghost:hover{background:color-mix(in oklch,#C53D2E,transparent 92%);}
+
+/* ── Densidade compacta (tweak) ───────────────────────────── */
+body.density-compact main{padding-top:26px;}
+body.density-compact .home-section{margin-bottom:32px;}
+body.density-compact .home-head{margin-bottom:26px;}
+body.density-compact .ev-grid,
+body.density-compact .inv-grid{gap:13px;}
+body.density-compact .inv-body{padding:12px 15px;gap:7px;}
+body.density-compact .card.pad{padding:16px 18px;}
+body.density-compact .home-greeting{font-size:32px;}
+
+/* ── Responsivo ───────────────────────────────────────────── */
+@media (max-width:860px){
+  .login-screen.screen.active{grid-template-columns:1fr;}
+  .login-art{display:none;}
+  .login-pane{min-height:100vh;}
+  .inv-grid{grid-template-columns:1fr;}
+}
+
+/* ── Screen container ─────────────────────────────────────── */
+main{max-width:var(--maxw);margin:0 auto;padding:38px 24px 80px;}
+.screen{display:none;animation:rise .42s cubic-bezier(.2,.8,.2,1);}
+.screen.active{display:block;}
+@keyframes rise{from{transform:translateY(14px);}to{transform:none;}}
+
+.eyebrow{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:14px;
+}
+.eyebrow::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--accent);}
+.muted{color:var(--ink-soft);}
+.section-title{font-size:24px;font-weight:700;margin-bottom:4px;}
+.section-sub{color:var(--ink-soft);font-size:15px;margin-bottom:20px;}
+
+/* ── Buttons ──────────────────────────────────────────────── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  padding:14px 24px;border-radius:var(--radius);font-weight:700;font-size:15.5px;
+  background:var(--accent);color:var(--accent-ink);transition:transform .12s,box-shadow .15s,filter .15s;
+  box-shadow:var(--shadow-sm);
+}
+.btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);filter:brightness(1.04);}
+.btn:active{transform:translateY(0);}
+.btn.secondary{background:var(--surface);color:var(--ink);border:1.5px solid var(--line-strong);box-shadow:none;}
+.btn.secondary:hover{background:var(--surface-2);border-color:var(--accent);}
+.btn.ghost{background:transparent;color:var(--accent);box-shadow:none;padding:10px 14px;}
+.btn.ghost:hover{background:color-mix(in oklch,var(--accent),transparent 90%);transform:none;}
+.btn.sm{padding:9px 16px;font-size:13.5px;border-radius:var(--radius-sm);}
+.btn.full{width:100%;}
+.btn[disabled]{opacity:.5;pointer-events:none;}
+
+/* ── Cards ────────────────────────────────────────────────── */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-sm);}
+.pad{padding:24px;}
+
+/* ── Event hero ───────────────────────────────────────────── */
+.hero{
+  position:relative;overflow:hidden;border-radius:calc(var(--radius) + 6px);
+  background:
+    radial-gradient(120% 90% at 12% -10%, color-mix(in oklch,var(--amber),transparent 78%), transparent 60%),
+    radial-gradient(120% 90% at 95% 0%, color-mix(in oklch,var(--pink),transparent 80%), transparent 55%),
+    var(--surface);
+  border:1px solid var(--line);box-shadow:var(--shadow-md);
+  padding:46px 44px 40px;margin-bottom:26px;
+}
+.confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+.confetti i{position:absolute;width:11px;height:11px;border-radius:3px;opacity:.85;}
+.hero-grid{position:relative;display:grid;grid-template-columns:1fr;gap:6px;}
+.event-pill{
+  display:inline-flex;align-items:center;gap:8px;align-self:start;
+  background:var(--surface);border:1px solid var(--line-strong);
+  padding:7px 14px;border-radius:var(--radius-pill);font-size:13px;font-weight:700;
+  color:var(--ink-soft);margin-bottom:18px;box-shadow:var(--shadow-sm);
+}
+.event-name{font-size:clamp(38px,6vw,62px);font-weight:800;letter-spacing:-.03em;line-height:.98;max-width:14ch;}
+.event-desc{font-size:17px;color:var(--ink-soft);max-width:52ch;margin-top:16px;line-height:1.55;}
+.event-meta{display:flex;flex-wrap:wrap;gap:10px 26px;margin-top:22px;}
+.meta-item{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600;}
+.meta-ico{width:34px;height:34px;border-radius:10px;background:var(--surface-2);display:grid;place-items:center;color:var(--accent);flex:none;}
+.meta-ico svg{width:17px;height:17px;}
+.meta-item .lab{display:block;font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-faint);}
+.meta-item .val{display:block;color:var(--ink);}
+
+/* ── Countdown (inline, sem caixas) ───────────────────────── */
+.countdown{display:flex;align-items:flex-start;gap:0;flex-wrap:wrap;margin-top:30px;}
+.cd-box{
+  text-align:center;padding:0 26px 0 0;position:relative;
+}
+.cd-box:last-child{padding-right:0;}
+.cd-num{font-family:var(--title-font);font-size:clamp(34px,5vw,50px);font-weight:800;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.02em;}
+.cd-lab{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);margin-top:9px;}
+.cd-done{margin-top:30px;font-size:18px;font-weight:700;color:var(--accent);}
+
+/* ── Guest avatars ────────────────────────────────────────── */
+.guest-strip{display:flex;flex-wrap:wrap;gap:10px;}
+.guest-chip{display:flex;align-items:center;gap:10px;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-pill);padding:6px 16px 6px 6px;font-weight:600;font-size:14.5px;}
+.avatar{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:14px;font-family:var(--title-font);flex:none;}
+.guest-empty{color:var(--ink-faint);font-style:italic;}
+.guest-count-note{font-size:13.5px;color:var(--ink-faint);margin-top:14px;}
+
+/* ── Event page layout (capa | convidados+presentes) ──────── */
+.event-layout{display:grid;grid-template-columns:1.04fr .96fr;gap:22px;align-items:stretch;}
+.event-layout .hero.cover{margin-bottom:0;height:100%;display:flex;align-items:center;}
+.event-layout .hero.cover .hero-grid{width:100%;}
+.col-right{display:grid;grid-template-rows:auto 1fr;gap:22px;min-width:0;}
+.col-right .card{display:flex;flex-direction:column;}
+.col-right .gift-card{min-height:0;}
+.anon-tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--ink-faint);background:var(--surface-2);border:1px solid var(--line);padding:4px 10px;border-radius:999px;}
+.gift-mini-list{flex:1;overflow:auto;}
+.gift-mini{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);}
+.gift-mini:last-child{border-bottom:none;}
+.gift-mini-name{font-weight:600;font-size:14.5px;}
+.gift-mini-name.is-reserved{color:var(--ink-faint);text-decoration:line-through;text-decoration-color:var(--line-strong);}
+.confirm-cta{width:100%;margin-top:22px;font-size:18px;padding:20px;letter-spacing:-.01em;}
+.confirm-cta-inline{display:none;width:100%;margin-top:26px;font-size:17px;padding:18px;}
+@media(max-width:820px){
+  .event-layout{grid-template-columns:1fr;}
+  .event-layout .hero.cover{height:auto;}
+  /* no mobile, a CTA fica dentro do convite (1ª div); a barra de baixo some */
+  .confirm-cta{display:none;}
+  .confirm-cta-inline{display:inline-flex;}
+}
+
+/* ── Layout helpers ───────────────────────────────────────── */
+.split{display:grid;grid-template-columns:1.6fr 1fr;gap:22px;align-items:start;}
+@media(max-width:820px){.split{grid-template-columns:1fr;}}
+.row-between{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.stack-lg{display:flex;flex-direction:column;gap:26px;}
+
+/* ── Forms ────────────────────────────────────────────────── */
+.form-grid{display:grid;gap:20px;}
+.field label{display:block;font-weight:700;font-size:14px;margin-bottom:7px;}
+.field .req{color:var(--coral);}
+.field input[type=text],.field input[type=email],.field select{
+  width:100%;padding:13px 15px;border:1.5px solid var(--line-strong);border-radius:var(--radius-sm);
+  background:var(--surface);transition:border-color .15s,box-shadow .15s;
+}
+.field input:focus,.field select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in oklch,var(--accent),transparent 86%);}
+.field.invalid input,.field.invalid select{border-color:var(--coral);}
+.err{display:none;color:var(--coral);font-size:13px;font-weight:600;margin-top:6px;}
+.field.invalid .err{display:block;}
+.hint{color:var(--ink-faint);font-size:13px;margin-top:6px;}
+
+.check-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;}
+.chk{display:flex;align-items:center;gap:11px;padding:12px 14px;border:1.5px solid var(--line-strong);border-radius:var(--radius-sm);cursor:pointer;transition:border-color .15s,background .15s;font-weight:600;font-size:14.5px;}
+.chk:hover{background:var(--surface-2);}
+.chk input{width:18px;height:18px;accent-color:var(--accent);cursor:pointer;}
+.chk.on{border-color:var(--accent);background:color-mix(in oklch,var(--accent),transparent 92%);}
+
+.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:18px;background:var(--surface-2);border-radius:var(--radius-sm);border:1px solid var(--line);}
+.toggle-row .tt{font-weight:700;}
+.toggle-row .ts{font-size:13.5px;color:var(--ink-soft);margin-top:3px;}
+.switch{position:relative;width:52px;height:30px;flex:none;}
+.switch input{opacity:0;width:0;height:0;}
+.slider{position:absolute;inset:0;background:var(--line-strong);border-radius:999px;transition:.2s;}
+.slider::before{content:"";position:absolute;height:24px;width:24px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.switch input:checked + .slider{background:var(--accent);}
+.switch input:checked + .slider::before{transform:translateX(22px);}
+
+/* ── RSVP wizard (modais por passo) ───────────────────────── */
+.rsvp-backdrop{min-height:calc(100vh - 200px);display:flex;align-items:center;justify-content:center;padding:10px 0;}
+.rsvp-modal{width:100%;max-width:520px;padding:28px 28px 24px;box-shadow:var(--shadow-lg);}
+.wz-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px;}
+.wz-eyebrow{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);}
+.wz-title{font-size:27px;font-weight:800;letter-spacing:-.02em;margin-top:6px;}
+.wz-close{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;color:var(--ink-faint);flex:none;transition:.15s;}
+.wz-close:hover{background:var(--surface-2);color:var(--ink);}
+.wz-close svg{width:17px;height:17px;}
+.wz-dots{display:flex;gap:7px;margin-bottom:24px;}
+.wz-dot{height:5px;flex:1;border-radius:999px;background:var(--line-strong);transition:background .3s;}
+.wz-dot.done{background:color-mix(in oklch,var(--accent),transparent 45%);}
+.wz-dot.on{background:var(--accent);}
+.wz-body{min-height:210px;animation:wzslide .3s cubic-bezier(.2,.8,.2,1);}
+@keyframes wzslide{from{transform:translateX(14px);}to{transform:none;}}
+.wz-foot{display:flex;gap:12px;margin-top:26px;}
+.wz-help{color:var(--ink-soft);font-size:15px;margin-bottom:18px;line-height:1.5;}
+.wz-field{margin-bottom:18px;}
+.wz-field label{display:block;font-weight:700;font-size:14px;margin-bottom:7px;}
+.wz-field .req{color:var(--coral);}
+.wz-field input{width:100%;padding:14px 15px;border:1.5px solid var(--line-strong);border-radius:var(--radius-sm);background:var(--surface);transition:border-color .15s,box-shadow .15s;}
+.wz-field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in oklch,var(--accent),transparent 86%);}
+.wz-field.invalid input{border-color:var(--coral);}
+.wz-field .err{display:none;color:var(--coral);font-size:13px;font-weight:600;margin-top:6px;}
+.wz-field.invalid .err{display:block;}
+
+/* acompanhantes */
+.comp-list{display:flex;flex-direction:column;gap:10px;}
+.comp-row{display:flex;align-items:center;gap:10px;animation:wzslide .25s ease;}
+.comp-num{width:30px;height:30px;border-radius:9px;background:var(--surface-2);color:var(--accent);font-weight:700;font-family:var(--title-font);display:grid;place-items:center;flex:none;font-size:14px;}
+.comp-row input{flex:1;padding:12px 14px;border:1.5px solid var(--line-strong);border-radius:var(--radius-sm);background:var(--surface);}
+.comp-row input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in oklch,var(--accent),transparent 86%);}
+.comp-del{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;color:var(--ink-faint);border:1px solid var(--line);background:var(--surface);flex:none;transition:.15s;}
+.comp-del:hover{color:var(--coral);border-color:var(--coral);}
+.comp-del svg{width:14px;height:14px;}
+.comp-empty{color:var(--ink-faint);font-style:italic;font-size:14.5px;}
+.add-comp{display:block;width:100%;margin-top:12px;padding:13px;border:1.5px dashed var(--line-strong);border-radius:var(--radius-sm);font-weight:700;color:var(--accent);background:var(--surface);transition:.15s;}
+.add-comp:hover{border-color:var(--accent);background:color-mix(in oklch,var(--accent),transparent 93%);}
+.add-comp.is-disabled{opacity:.45;pointer-events:none;}
+
+/* pergunta de visibilidade */
+.vis-q{margin-top:24px;padding-top:22px;border-top:1px solid var(--line);}
+.vis-label{font-weight:700;font-size:15px;margin-bottom:14px;line-height:1.4;}
+.vis-opts{display:flex;gap:12px;}
+.vis-opt{flex:1;display:flex;align-items:center;gap:10px;justify-content:center;padding:14px;border:1.5px solid var(--line-strong);border-radius:var(--radius-sm);font-weight:700;color:var(--ink-soft);transition:.15s;}
+.vis-opt:hover{border-color:var(--accent);}
+.vis-opt.on{border-color:var(--accent);background:color-mix(in oklch,var(--accent),transparent 92%);color:var(--ink);}
+.vis-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--line-strong);transition:.15s;}
+.vis-opt.on .vis-radio{border-color:var(--accent);background:radial-gradient(circle at center,var(--accent) 0 42%,transparent 46%);}
+
+/* escolha de presente */
+.gift-pick{display:flex;flex-direction:column;gap:10px;}
+.gift-opt{display:flex;align-items:center;gap:12px;text-align:left;padding:14px 16px;border:1.5px solid var(--line-strong);border-radius:var(--radius-sm);background:var(--surface);transition:.15s;}
+.gift-opt:hover{border-color:var(--accent);}
+.gift-opt.on{border-color:var(--accent);background:color-mix(in oklch,var(--accent),transparent 92%);}
+.gp-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--line-strong);flex:none;transition:.15s;}
+.gift-opt.on .gp-radio{border-color:var(--accent);background:radial-gradient(circle at center,var(--accent) 0 42%,transparent 46%);}
+.gp-name{font-weight:600;font-size:14.5px;}
+.gift-opt .status,.gift-opt .gtag{margin-left:auto;}
+.gp-group-label{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);margin:6px 0 -2px;}
+.gp-custom{margin-top:18px;padding-top:18px;border-top:1px solid var(--line);}
+.gp-custom-label{display:block;font-weight:700;font-size:14px;margin-bottom:8px;}
+.gp-custom input{width:100%;padding:13px 15px;border:1.5px solid var(--line-strong);border-radius:var(--radius-sm);background:var(--surface);transition:border-color .15s,box-shadow .15s;}
+.gp-custom input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in oklch,var(--accent),transparent 86%);}
+
+/* ── Success ──────────────────────────────────────────────── */
+.success-wrap{max-width:560px;margin:20px auto;text-align:center;}
+.success-badge{width:92px;height:92px;border-radius:50%;background:color-mix(in oklch,var(--accent),transparent 88%);display:grid;place-items:center;margin:0 auto 26px;color:var(--accent);animation:pop .5s cubic-bezier(.2,1.4,.4,1);}
+.success-badge svg{width:46px;height:46px;}
+@keyframes pop{from{transform:scale(.6);}to{transform:scale(1);}}
+.success-wrap h1{font-size:clamp(30px,5vw,42px);font-weight:800;letter-spacing:-.02em;}
+.notice{display:flex;gap:13px;text-align:left;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:16px 18px;margin:26px 0;font-size:14.5px;color:var(--ink-soft);}
+.notice svg{width:20px;height:20px;color:var(--accent);flex:none;margin-top:1px;}
+
+/* ── Tabs (guest area) ────────────────────────────────────── */
+.tabs{display:flex;gap:6px;background:var(--surface-2);border:1px solid var(--line);padding:6px;border-radius:var(--radius);margin-bottom:26px;flex-wrap:wrap;}
+.tab{flex:1;min-width:130px;padding:12px 16px;border-radius:var(--radius-sm);font-weight:700;font-size:14.5px;color:var(--ink-soft);transition:.15s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.tab:hover{color:var(--ink);}
+.tab.active{background:var(--surface);color:var(--ink);box-shadow:var(--shadow-sm);}
+.tab.active .tab-dot{background:var(--accent);}
+.tab-dot{width:8px;height:8px;border-radius:50%;background:var(--line-strong);}
+.tabpanel{display:none;}
+.tabpanel.active{display:block;animation:rise .3s ease;}
+
+/* ── Gifts grid ───────────────────────────────────────────── */
+.grid-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;}
+.gift{display:flex;flex-direction:column;gap:14px;padding:20px;}
+.gift-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+.gift-ico{width:46px;height:46px;border-radius:13px;background:var(--surface-2);display:grid;place-items:center;color:var(--accent);flex:none;}
+.gift-ico svg{width:23px;height:23px;}
+.gift-name{font-weight:700;font-size:16px;line-height:1.25;}
+.status{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;letter-spacing:.02em;}
+.status.free{background:color-mix(in oklch,#1F8A5B,transparent 88%);color:#16794f;}
+.status.taken{background:var(--surface-2);color:var(--ink-faint);}
+.status .d{width:7px;height:7px;border-radius:50%;background:currentColor;}
+.gift.reserved{opacity:.82;}
+/* tags de presente: sugestão do organizador vs alguém vai levar */
+.gtag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap;}
+.gtag .d{width:7px;height:7px;border-radius:50%;background:currentColor;}
+.gtag.suggest{background:color-mix(in oklch,var(--amber),transparent 80%);color:#9a6a12;}
+.gtag.bring{background:color-mix(in oklch,#1F8A5B,transparent 86%);color:#16794f;}
+.gtag.mine{background:color-mix(in oklch,var(--accent),transparent 86%);color:var(--accent);}
+.add-gift-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:16px;background:var(--surface-2);border:1px dashed var(--line-strong);border-radius:var(--radius-sm);margin-bottom:18px;}
+.add-gift-bar input{flex:1;min-width:200px;padding:12px 14px;border:1.5px solid var(--line-strong);border-radius:var(--radius-sm);background:var(--surface);}
+.add-gift-bar input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in oklch,var(--accent),transparent 86%);}
+
+/* ── Polls ────────────────────────────────────────────────── */
+.poll{padding:22px;}
+.poll-q{font-weight:700;font-size:17px;margin-bottom:16px;}
+.poll-opt{border:1.5px solid var(--line-strong);border-radius:var(--radius-sm);padding:13px 15px;margin-bottom:10px;cursor:pointer;transition:.15s;position:relative;overflow:hidden;}
+.poll-opt:hover{border-color:var(--accent);}
+.poll-opt .label-row{display:flex;align-items:center;gap:11px;position:relative;z-index:1;}
+.poll-opt input{width:19px;height:19px;accent-color:var(--accent);}
+.poll-opt .opt-label{font-weight:600;}
+.poll.voted .poll-opt{cursor:default;border-color:var(--line);}
+.poll.voted .poll-opt:hover{border-color:var(--line);}
+.bar-fill{position:absolute;left:0;top:0;bottom:0;background:color-mix(in oklch,var(--accent),transparent 84%);width:0;transition:width .6s cubic-bezier(.2,.8,.2,1);z-index:0;}
+.poll-opt.picked .bar-fill{background:color-mix(in oklch,var(--accent),transparent 72%);}
+.poll-opt.picked{border-color:var(--accent);}
+.pct{margin-left:auto;font-weight:700;font-variant-numeric:tabular-nums;position:relative;z-index:1;}
+.poll-foot{font-size:13px;color:var(--ink-faint);margin-top:6px;}
+.voted-tag{display:none;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--accent);margin-bottom:14px;}
+.poll.voted .voted-tag{display:inline-flex;}
+
+/* ── Supplies ─────────────────────────────────────────────── */
+.supply{display:flex;align-items:center;gap:16px;padding:16px 20px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface);margin-bottom:12px;box-shadow:var(--shadow-sm);}
+.supply.is-done{opacity:.72;}
+.supply .qty{width:46px;height:46px;border-radius:12px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-family:var(--title-font);font-weight:700;font-size:18px;flex:none;}
+.supply .s-main{min-width:0;}
+.supply .s-name{font-weight:700;font-size:15.5px;display:flex;align-items:center;}
+.supply .s-meta{font-size:13px;color:var(--ink-soft);margin-top:5px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.slot-dots{display:inline-flex;gap:4px;}
+.slot-dot{width:9px;height:9px;border-radius:50%;background:var(--line-strong);transition:background .2s;}
+.slot-dot.filled{background:#1F8A5B;}
+.supply .spacer{margin-left:auto;}
+.taken-by{font-size:13px;font-weight:700;color:#16794f;display:flex;align-items:center;gap:7px;}
+
+/* admin · insumos */
+.supply-suggest-row{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px 16px;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-sm);margin-bottom:14px;cursor:pointer;}
+.ssr-title{font-weight:700;font-size:14.5px;}
+.ssr-sub{font-size:13px;color:var(--ink-soft);margin-top:2px;}
+.supply-need{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600;color:var(--ink-soft);}
+.supply-need input{width:64px;padding:11px 12px;border:1.5px solid var(--line-strong);border-radius:var(--radius-sm);background:var(--surface);text-align:center;font-weight:700;}
+.supply-need input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in oklch,var(--accent),transparent 86%);}
+
+/* ── Admin ────────────────────────────────────────────────── */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:30px;}
+@media(max-width:760px){.metrics{grid-template-columns:repeat(2,1fr);}}
+.metric{padding:22px;position:relative;overflow:hidden;}
+.metric .m-ico{position:absolute;top:18px;right:18px;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;}
+.metric .m-ico svg{width:16px;height:16px;}
+.metric .m-num{font-family:var(--title-font);font-size:42px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;}
+.metric .m-lab{font-size:13px;font-weight:600;color:var(--ink-soft);margin-top:8px;}
+
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);}
+table{width:100%;border-collapse:collapse;font-size:14.5px;min-width:640px;}
+thead th{text-align:left;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-faint);padding:14px 18px;background:var(--surface-2);border-bottom:1px solid var(--line);white-space:nowrap;}
+tbody td{padding:14px 18px;border-bottom:1px solid var(--line);vertical-align:middle;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr{transition:background .12s;}
+tbody tr:hover{background:var(--surface-2);}
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:4px 11px;border-radius:999px;}
+.tag.confirmed{background:color-mix(in oklch,#1F8A5B,transparent 88%);color:#16794f;}
+.tag.pending{background:color-mix(in oklch,var(--amber),transparent 80%);color:#9a6a12;}
+.tag.vis{background:color-mix(in oklch,var(--accent),transparent 88%);color:var(--accent);}
+.tag.hid{background:var(--surface-2);color:var(--ink-faint);}
+.icon-btn{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;color:var(--ink-faint);border:1px solid var(--line);background:var(--surface);transition:.15s;}
+.icon-btn:hover{color:var(--coral);border-color:var(--coral);background:color-mix(in oklch,var(--coral),transparent 92%);}
+.icon-btn svg{width:16px;height:16px;}
+
+.admin-list-item{display:flex;align-items:center;gap:14px;padding:13px 16px;border:1px solid var(--line);border-radius:var(--radius-sm);margin-bottom:10px;background:var(--surface);}
+.admin-list-item .ali-name{font-weight:600;}
+.admin-list-item .spacer{margin-left:auto;}
+
+.inline-form{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:16px;background:var(--surface-2);border:1px dashed var(--line-strong);border-radius:var(--radius-sm);margin-top:6px;}
+.inline-form input{flex:1;min-width:160px;padding:11px 14px;border:1.5px solid var(--line-strong);border-radius:var(--radius-sm);background:var(--surface);}
+.inline-form.hidden{display:none;}
+
+.poll-builder{display:none;flex-direction:column;gap:10px;padding:18px;background:var(--surface-2);border:1px dashed var(--line-strong);border-radius:var(--radius-sm);margin-top:6px;}
+.poll-builder.show{display:flex;}
+.poll-builder input{padding:11px 14px;border:1.5px solid var(--line-strong);border-radius:var(--radius-sm);background:var(--surface);}
+.opt-inputs{display:flex;flex-direction:column;gap:8px;}
+
+.admin-block{margin-top:34px;}
+
+/* ── Admin home (grid de eventos) ─────────────────────────── */
+.back-link{font-weight:700;font-size:14px;color:var(--ink-soft);padding:6px 0;transition:.15s;}
+.back-link:hover{color:var(--accent);}
+.ev-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(225px,1fr));gap:18px;}
+.ev-card{display:flex;flex-direction:column;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);transition:transform .14s,box-shadow .16s;padding:0;}
+.ev-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md);}
+.ev-cover{height:108px;display:grid;place-items:center;position:relative;}
+.ev-emoji{font-size:42px;filter:drop-shadow(0 3px 6px rgba(0,0,0,.18));}
+.ev-emoji.big{font-size:54px;}
+.ev-card-body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:9px;flex:1;}
+.ev-card-name{font-size:18px;font-weight:700;letter-spacing:-.01em;line-height:1.2;}
+.ev-card-meta{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--ink-soft);}
+.ev-card-meta svg{width:15px;height:15px;color:var(--ink-faint);}
+.ev-card-foot{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:6px;}
+.ev-people{display:flex;align-items:center;gap:6px;font-weight:700;font-size:13.5px;color:var(--ink);}
+.ev-people svg{width:15px;height:15px;color:var(--ink-faint);}
+.ev-flags{display:flex;gap:5px;}
+.ev-flag{width:24px;height:24px;border-radius:7px;display:grid;place-items:center;background:color-mix(in oklch,var(--accent),transparent 88%);color:var(--accent);}
+.ev-flag svg{width:13px;height:13px;}
+.ev-flag-none{font-size:11.5px;font-weight:700;color:var(--ink-faint);background:var(--surface-2);padding:3px 9px;border-radius:999px;}
+.ev-new{align-items:center;justify-content:center;gap:10px;border:1.5px dashed var(--line-strong);background:var(--surface-2);min-height:200px;color:var(--accent);}
+.ev-new:hover{border-color:var(--accent);background:color-mix(in oklch,var(--accent),transparent 93%);}
+.ev-new-plus{font-size:38px;font-weight:700;line-height:1;font-family:var(--title-font);}
+.ev-new-label{font-weight:700;font-size:15px;}
+
+/* ── Gerenciar evento (layout do esboço) ──────────────────── */
+.share-card{display:flex;gap:16px;padding:20px 22px;margin-bottom:20px;align-items:flex-start;}
+.share-ico{width:46px;height:46px;border-radius:13px;background:color-mix(in oklch,var(--accent),transparent 88%);color:var(--accent);display:grid;place-items:center;flex:none;}
+.share-ico svg{width:23px;height:23px;}
+.share-main{flex:1;min-width:0;}
+.share-label{font-weight:700;font-size:16px;letter-spacing:-.01em;}
+.share-hint{font-size:13.5px;color:var(--ink-soft);margin:3px 0 13px;line-height:1.45;}
+.share-row{display:flex;gap:10px;flex-wrap:wrap;}
+.share-row input{flex:1;min-width:200px;padding:13px 15px;border:1.5px solid var(--line-strong);border-radius:var(--radius-sm);background:var(--surface-2);font-weight:600;color:var(--ink);font-family:"Space Grotesk","Plus Jakarta Sans",monospace;font-size:14px;cursor:pointer;}
+.share-row input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in oklch,var(--accent),transparent 86%);}
+.share-copy{flex:none;}
+.share-copy svg{width:15px;height:15px;}
+.share-copy.copied{background:#1F8A5B;}
+@media(max-width:680px){.share-row input{min-width:100%;}.share-copy{width:100%;}}
+.manage-legend{display:flex;align-items:center;font-size:13px;color:var(--ink-soft);font-weight:600;margin-bottom:16px;}
+.manage-grid{display:grid;grid-template-columns:1.35fr 1fr;grid-auto-rows:auto;gap:18px;}
+.manage-grid .cover-card{grid-row:span 2;}
+@media(max-width:780px){.manage-grid{grid-template-columns:1fr;}.manage-grid .cover-card{grid-row:auto;}}
+.manage-card{padding:20px;display:flex;flex-direction:column;position:relative;transition:opacity .2s;}
+.manage-card.sec-off{opacity:.6;}
+.manage-card-radio{display:inline-flex;align-items:center;gap:9px;font-size:12.5px;font-weight:700;color:var(--ink-soft);cursor:pointer;margin-bottom:14px;align-self:flex-start;user-select:none;}
+.manage-card-radio:hover{color:var(--ink);}
+.radio-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--line-strong);flex:none;transition:.15s;}
+.radio-dot.on{border-color:var(--accent);background:radial-gradient(circle at center,var(--accent) 0 42%,transparent 46%);}
+.manage-card-head{display:flex;gap:13px;align-items:flex-start;}
+.manage-ico{width:42px;height:42px;border-radius:12px;background:var(--surface-2);color:var(--accent);display:grid;place-items:center;flex:none;}
+.manage-ico svg{width:21px;height:21px;}
+.manage-card-title{font-size:17px;font-weight:700;letter-spacing:-.01em;}
+.manage-card-desc{font-size:13.5px;color:var(--ink-soft);margin-top:3px;line-height:1.45;}
+.cover-card{padding:0;overflow:hidden;}
+.cover-card-top{height:120px;display:grid;place-items:center;}
+.cover-card-body{padding:20px;}
+.cover-meta{display:flex;flex-direction:column;gap:9px;margin-top:16px;}
+.cover-meta div{display:flex;align-items:center;gap:9px;font-size:13.5px;font-weight:600;color:var(--ink);}
+.cover-meta svg{width:16px;height:16px;color:var(--accent);flex:none;}
+.cover-card .btn.sm svg{width:15px;height:15px;}
+
+/* ── Modal criar/editar evento ────────────────────────────── */
+.ev-overlay{position:fixed;inset:0;z-index:200;background:color-mix(in oklch,var(--ink),transparent 55%);backdrop-filter:blur(3px);display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:48px 20px;}
+.ev-overlay.open{display:flex;animation:fadein .2s ease;}
+@keyframes fadein{from{opacity:0;}to{opacity:1;}}
+.ev-modal{width:100%;max-width:540px;padding:26px 26px 22px;box-shadow:var(--shadow-lg);animation:pop .32s cubic-bezier(.2,1.2,.4,1);}
+.ev-form{display:flex;flex-direction:column;gap:16px;}
+.ev-row{display:flex;gap:12px;}
+.ev-form input{width:100%;padding:13px 14px;border:1.5px solid var(--line-strong);border-radius:var(--radius-sm);background:var(--surface);transition:border-color .15s,box-shadow .15s;}
+.ev-form input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in oklch,var(--accent),transparent 86%);}
+.ev-visblock{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:16px 18px;}
+.ev-visblock-title{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px;}
+.ev-vis-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);cursor:pointer;}
+.ev-vis-row:last-child{border-bottom:none;}
+.ev-vis-label{font-weight:600;font-size:14.5px;}
+
+/* layout do evento sem coluna direita */
+.event-layout.solo{grid-template-columns:1fr;}
+
+/* ── RESPONSIVO / MOBILE ──────────────────────────────────── */
+@media(max-width:680px){
+  main{padding:24px 16px 64px;}
+  /* navbar compacta */
+  .topbar-inner{height:60px;padding:0 16px;gap:12px;}
+  .brand-name{font-size:18px;}
+  .nav-links{gap:2px;}
+  .nav-link{padding:8px 11px;font-size:13px;}
+  .nav-link.admin{margin-left:2px;}
+  /* convite */
+  .hero{padding:30px 22px 28px;border-radius:calc(var(--radius) + 2px);}
+  .event-meta{gap:14px 0;flex-direction:column;}
+  .countdown{margin-top:24px;}
+  .cd-box{padding:0 18px 0 0;}
+  /* seções empilhadas com respiro */
+  .col-right{gap:16px;}
+  .section-title{font-size:20px;}
+  /* admin */
+  .ev-grid{grid-template-columns:1fr;}
+  .metrics{gap:12px;}
+  .rsvp-modal{padding:22px 18px 20px;}
+  .wz-title{font-size:23px;}
+}
+@media(max-width:380px){
+  .nav-link{padding:7px 9px;font-size:12px;}
+  .brand-name{font-size:16px;}
+  .event-name{font-size:34px;}
+}
+
+/* ── Tweaks panel (vanilla, host-protocol) ────────────────── */
+#tweaks{
+  position:fixed;right:18px;bottom:18px;z-index:9999;width:268px;display:none;
+  background:rgba(255,251,247,.92);backdrop-filter:blur(14px) saturate(1.3);
+  border:1px solid var(--line-strong);border-radius:16px;box-shadow:var(--shadow-lg);
+  font-family:"Plus Jakarta Sans",sans-serif;color:var(--ink);overflow:hidden;
+}
+#tweaks.open{display:block;}
+.tw-head{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--line);cursor:grab;}
+.tw-head .t{font-family:var(--title-font);font-weight:700;font-size:15px;}
+.tw-x{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;color:var(--ink-soft);}
+.tw-x:hover{background:var(--surface-2);color:var(--ink);}
+.tw-body{padding:14px 16px 18px;display:flex;flex-direction:column;gap:18px;}
+.tw-sec{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:-6px;}
+.tw-label{font-size:13px;font-weight:600;margin-bottom:8px;}
+.seg{display:flex;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:3px;gap:3px;}
+.seg button{flex:1;padding:8px;border-radius:7px;font-size:13px;font-weight:700;color:var(--ink-soft);transition:.12s;}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow-sm);}
+.swatches{display:flex;gap:9px;}
+.swatch{width:34px;height:34px;border-radius:9px;cursor:pointer;border:2px solid transparent;transition:.12s;position:relative;}
+.swatch.on{border-color:var(--ink);}
+.swatch.on::after{content:"✓";position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:14px;font-weight:700;}
+.fontsel{width:100%;padding:10px 12px;border:1.5px solid var(--line-strong);border-radius:9px;background:var(--surface);font-weight:600;}
+</style>
+</head>
+<body>
+
+<!-- ════════════ NAVBAR (persistente · centrada no usuário) ════════════ -->
+<nav class="topbar" id="topbar">
+  <div class="topbar-inner">
+    <div class="brand" onclick="goHome()">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21h16v-7H4z"/><path d="M4 14c0-1.5 1-2 2-2s2 .5 2 2 1 2 2 2 2-.5 2-2 1-2 2-2 2 .5 2 2"/><path d="M12 8V4"/><circle cx="12" cy="3" r="1"/></svg>
+      </div>
+      <span class="brand-name">Event<b>Bday</b></span>
+    </div>
+    <div class="nav-links">
+      <a class="nav-link" data-nav="screen-home" onclick="goHome()">Início</a>
+    </div>
+    <div class="account" id="account">
+      <button class="account-btn" id="account-btn" onclick="toggleAccountMenu(event)" aria-haspopup="true">
+        <span class="avatar account-av" id="account-av"></span>
+        <span class="account-name" id="account-name"></span>
+        <svg class="account-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <div class="account-menu" id="account-menu">
+        <div class="account-menu-head">
+          <span class="avatar" id="account-menu-av"></span>
+          <div class="amh-text">
+            <div class="amh-name" id="account-menu-name"></div>
+            <div class="amh-email" id="account-menu-email"></div>
+          </div>
+        </div>
+        <button class="account-menu-item" onclick="goHome()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/></svg>
+          Meus eventos
+        </button>
+        <button class="account-menu-item danger" onclick="logout()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg>
+          Sair
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Banner de pré-visualização: organizador vendo o próprio evento como convidado -->
+<div class="preview-banner" id="preview-banner">
+  <div class="preview-banner-inner">
+    <span class="pb-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>Modo pré-visualização</span>
+    <span class="pb-text">Você está vendo este evento <b>como um convidado o veria</b>.</span>
+    <button class="pb-back" onclick="backToManage()">← Voltar para a gestão</button>
+  </div>
+</div>
+
+<!-- ════════════ 0 · ENTRADA (login / cadastro) ════════════ -->
+<section id="screen-login" class="screen login-screen" data-screen-label="Entrada">
+  <div class="login-art">
+    <div class="login-art-confetti" id="login-confetti"></div>
+    <div class="login-art-inner">
+      <div class="login-brand">
+        <div class="brand-mark lg">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21h16v-7H4z"/><path d="M4 14c0-1.5 1-2 2-2s2 .5 2 2 1 2 2 2 2-.5 2-2 1-2 2-2 2 .5 2 2"/><path d="M12 8V4"/><circle cx="12" cy="3" r="1"/></svg>
+        </div>
+        <span class="login-brand-name">Event<b>Bday</b></span>
+      </div>
+      <h1 class="login-art-title">Organize e participe<br />de eventos inesquecíveis.</h1>
+      <p class="login-art-sub">Uma conta só para tudo: crie os seus eventos e responda aos convites que você recebe — no mesmo lugar.</p>
+      <ul class="login-art-points">
+        <li><span class="lap-dot"></span>Crie eventos e convide seus amigos</li>
+        <li><span class="lap-dot"></span>Confirme presença nos convites que recebe</li>
+        <li><span class="lap-dot"></span>Presentes, enquetes e lista de insumos</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="login-pane">
+    <div class="login-card">
+      <div class="login-tabs">
+        <button class="login-tab active" data-auth="signin" onclick="setAuthMode('signin')">Entrar</button>
+        <button class="login-tab" data-auth="signup" onclick="setAuthMode('signup')">Criar conta</button>
+      </div>
+
+      <h2 class="login-title" id="login-title">Bem-vinda de volta 👋</h2>
+      <p class="login-lede" id="login-lede">Entre para ver seus eventos e convites.</p>
+
+      <form class="login-form" onsubmit="doLogin(event)">
+        <div class="wz-field login-name" id="login-name-field" style="display:none;">
+          <label>Nome completo</label>
+          <input type="text" id="login-name" placeholder="Como você quer ser chamado(a)" autocomplete="name" />
+        </div>
+        <div class="wz-field">
+          <label>E-mail</label>
+          <input type="email" id="login-email" placeholder="voce@email.com" value="maria@eventbday.app" autocomplete="email" />
+        </div>
+        <div class="wz-field" style="margin-bottom:8px;">
+          <label>Senha</label>
+          <input type="password" id="login-pass" placeholder="••••••••" value="senha123" autocomplete="current-password" />
+        </div>
+        <button class="btn full" type="submit" id="login-submit" style="margin-top:14px;font-size:16px;padding:16px;">Entrar →</button>
+      </form>
+
+      <p class="login-demo">🔒 Demonstração — qualquer e-mail/senha entra como <b>Maria</b>. Nenhum dado real é enviado.</p>
+    </div>
+  </div>
+</section>
+
+<main>
+  <!-- ════════════ HOME UNIFICADA (organizo + convites) ════════════ -->
+  <section id="screen-home" class="screen" data-screen-label="Início · Meus eventos"></section>
+
+  <!-- ════════════ 1 · PÁGINA PÚBLICA DO EVENTO ════════════ -->
+  <section id="screen-event" class="screen" data-screen-label="Evento (público)"></section>
+
+  <!-- ════════════ 2 · FORMULÁRIO RSVP (wizard em modais) ════════════ -->
+  <section id="screen-rsvp" class="screen" data-screen-label="RSVP">
+    <div class="rsvp-backdrop">
+      <div class="rsvp-modal card" id="rsvp-modal" role="dialog" aria-modal="true"></div>
+    </div>
+  </section>
+
+  <!-- ════════════ 3 · SUCESSO DO RSVP ════════════ -->
+  <section id="screen-success" class="screen" data-screen-label="Sucesso RSVP">
+    <div class="success-wrap">
+      <div class="success-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+      </div>
+      <span class="eyebrow" style="justify-content:center;">Presença confirmada</span>
+      <h1 id="success-title">Tudo certo!</h1>
+      <p class="muted" style="font-size:17px;margin-top:14px;" id="success-sub">Mal podemos esperar para te ver na festa.</p>
+
+      <div class="notice">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+        <div>Um e-mail de confirmação <b>seria enviado</b> para o endereço informado, com os detalhes do evento e o link da sua área de convidado. <span class="muted">(demonstração — nenhum e-mail real é enviado)</span></div>
+      </div>
+
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn secondary" onclick="showScreen('screen-event')">Ver o evento</button>
+        <button class="btn" onclick="showScreen('screen-guest')">Acessar área do convidado →</button>
+      </div>
+      <button class="btn ghost" style="margin-top:18px;" onclick="goHome()">← Voltar para meus eventos</button>
+    </div>
+  </section>
+
+  <!-- ════════════ 4 · ÁREA DO CONVIDADO ════════════ -->
+  <section id="screen-guest" class="screen" data-screen-label="Área do convidado">
+    <button class="back-link" onclick="goHome()">← Meus eventos</button>
+    <span class="eyebrow" id="guest-eyebrow">Área do convidado</span>
+    <h1 class="section-title" style="font-size:32px;" id="guest-title">Participe dos preparativos 🎉</h1>
+    <p class="section-sub">Escolha um presente, vote nas enquetes e ajude com os insumos da festa.</p>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="gifts" onclick="showTab('gifts')"><span class="tab-dot"></span>Presentes</button>
+      <button class="tab" data-tab="polls" onclick="showTab('polls')"><span class="tab-dot"></span>Enquetes</button>
+      <button class="tab" data-tab="supplies" onclick="showTab('supplies')"><span class="tab-dot"></span>Insumos</button>
+    </div>
+
+    <div id="tab-gifts" class="tabpanel active"></div>
+    <div id="tab-polls" class="tabpanel"></div>
+    <div id="tab-supplies" class="tabpanel"></div>
+  </section>
+
+  <!-- ════════════ 5 · HOME UNIFICADA (movida para o topo) ════════════ -->
+  <!-- ════════════ 5b · ADMIN — GERENCIAR EVENTO ════════════ -->
+  <section id="screen-manage" class="screen" data-screen-label="Admin · Gerenciar evento"></section>
+</main>
+
+<!-- ════════════ MODAL CRIAR / EDITAR EVENTO ════════════ -->
+<div class="ev-overlay" id="ev-overlay">
+  <div class="ev-modal card" id="ev-modal" role="dialog" aria-modal="true"></div>
+</div>
+
+<!-- ════════════ TWEAKS PANEL ════════════ -->
+<div id="tweaks">
+  <div class="tw-head" id="tw-head">
+    <span class="t">Tweaks</span>
+    <button class="tw-x" id="tw-close" aria-label="Fechar">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="tw-body">
+    <div>
+      <div class="tw-sec" style="margin-bottom:8px;">Forma</div>
+      <div class="tw-label">Cantos</div>
+      <div class="seg" id="tw-corners">
+        <button data-v="rounded">Arredondado</button>
+        <button data-v="sharp">Reto</button>
+      </div>
+    </div>
+    <div>
+      <div class="tw-label">Cor de destaque</div>
+      <div class="swatches" id="tw-accent"></div>
+    </div>
+    <div>
+      <div class="tw-label">Densidade</div>
+      <div class="seg" id="tw-density">
+        <button data-v="comfortable">Confortável</button>
+        <button data-v="compact">Compacto</button>
+      </div>
+    </div>
+    <div>
+      <div class="tw-label">Fonte dos títulos</div>
+      <select class="fontsel" id="tw-font">
+        <option value="Bricolage Grotesque">Bricolage Grotesque</option>
+        <option value="Unbounded">Unbounded</option>
+        <option value="Space Grotesk">Space Grotesk</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   EventBday — protótipo navegável (single-file, vanilla JS)
+   Navegação: showScreen(id) troca display entre <section.screen>
+   Estado: objeto global `state`; ações mutam o estado e re-renderizam
+   ════════════════════════════════════════════════════════════ */
+
+/* ── ESTADO INICIAL (dados mockados) ───────────────────────────
+   Modelo multi-evento: cada evento carrega seus próprios dados
+   (convidados, presentes, enquetes, insumos) e flags de visibilidade.
+   `state.event/guests/gifts/polls/supplies` são acessores do evento ativo,
+   para que todo o código de telas continue funcionando sem alteração. */
+const state = {
+  /* ── REGISTRO DE USUÁRIOS (multi-tenant) ──────────────────────
+     Toda pessoa é um usuário da plataforma. Um mesmo usuário pode
+     ORGANIZAR eventos (é dono — ownerId) e RECEBER CONVITES para
+     eventos de outros (aparece em `guests` com seu userId).        */
+  users: {
+    u1: { id:"u1", name:"Maria Brandão", email:"maria@eventbday.app" },
+    u2: { id:"u2", name:"Lúcia Ferreira", email:"lucia@ex.com" },
+    u3: { id:"u3", name:"Pedro Santos",  email:"pedro@ex.com" }
+  },
+  currentUserId: "u1",   // usuário logado na sessão
+  loggedIn: false,
+
+  _events: [
+    {
+      id: 1,
+      ownerId: "u1",                 // ← Maria ORGANIZA este evento
+      name: "Aniversário da Maria",
+      // data original do briefing: 2025-09-15. Atualizada p/ 2026 para o contador ficar ativo na demo.
+      date: "2026-09-15T19:00:00",
+      location: "Rua das Flores, 123 — Brasília, DF",
+      description: "Vem comemorar comigo! Será uma noite especial com muita música e alegria.",
+      emoji: "🎂",
+      // o que aparece nas páginas públicas / área do convidado
+      show: { guests: true, gifts: true, polls: true, supplies: true },
+      supplySuggest: true, // convidados podem sugerir novos insumos
+      guests: [
+        { id:1, name:"Ana Souza",    email:"ana@ex.com",   companions:1, dietary:["Vegetariano"], visible:true,  status:"confirmed" },
+        { id:2, name:"Bruno Lima",   email:"bruno@ex.com", companions:0, dietary:[],              visible:false, status:"confirmed" },
+        { id:3, name:"Carla Mendes", email:"carla@ex.com", companions:2, dietary:["Sem glúten"],  visible:true,  status:"pending"   }
+      ],
+      gifts: [
+        // source: "admin" = sugestão do organizador · "guest" = o que um convidado vai levar
+        { id:1, name:"Kit de vinhos",            source:"admin", claimed:false, byMe:false },
+        { id:2, name:"Perfume",                  source:"admin", claimed:true,  byMe:false },
+        { id:3, name:"Livro: O Poder do Hábito", source:"admin", claimed:false, byMe:false },
+        { id:4, name:"Flores",                   source:"admin", claimed:false, byMe:false }
+      ],
+      polls: [
+        { id:1, question:"Qual tema você prefere para a festa?", options:[
+          { id:"a", label:"Anos 80",            votes:8 },
+          { id:"b", label:"Tropical",           votes:5 },
+          { id:"c", label:"Clássico elegante",  votes:7 }
+        ], active:true, userVote:null }
+      ],
+      supplies: [
+        // needed = nº mínimo de pessoas que devem levar · takenBy = quem já se inscreveu
+        { id:1, name:"Refrigerante 2L", needed:4,  takenBy:[],            source:"admin" },
+        { id:2, name:"Salgadinhos",     needed:3,  takenBy:["Ana Souza"], source:"admin" },
+        { id:3, name:"Guardanapos",     needed:2,  takenBy:[],            source:"admin" }
+      ]
+    },
+    {
+      id: 4,
+      ownerId: "u1",                 // ← Maria ORGANIZA este evento também
+      name: "Jantar dos 60 do Papai",
+      date: "2026-11-08T20:00:00",
+      location: "Restaurante Belvedere — Brasília, DF",
+      description: "Uma noite especial para celebrar os 60 anos do meu pai. Surpresa!",
+      emoji: "🎉",
+      show: { guests: true, gifts: true, polls: false, supplies: false },
+      supplySuggest: false,
+      guests: [
+        { id:1, name:"Tio Carlos", email:"carlos@ex.com", companions:1, dietary:[], visible:true, status:"confirmed" }
+      ],
+      gifts: [
+        { id:1, name:"Relógio clássico", source:"admin", claimed:false, byMe:false },
+        { id:2, name:"Caixa de charutos", source:"admin", claimed:false, byMe:false }
+      ],
+      polls: [],
+      supplies: []
+    },
+    {
+      id: 2,
+      ownerId: "u2",                 // ← Lúcia organiza · Maria é CONVIDADA
+      name: "Chá de Bebê da Lúcia",
+      date: "2026-07-04T15:00:00",
+      location: "Salão Jardim — São Paulo, SP",
+      description: "Uma tarde doce para celebrar a chegada do nosso bebê. Venha com a gente!",
+      emoji: "🍼",
+      show: { guests: true, gifts: true, polls: false, supplies: true },
+      supplySuggest: false,
+      guests: [
+        { id:1, name:"Marina Alves", email:"marina@ex.com", companions:0, dietary:[], visible:true, status:"confirmed" },
+        // Maria foi convidada — convite ainda PENDENTE
+        { id:2, userId:"u1", name:"Maria Brandão", email:"maria@eventbday.app", companions:0, dietary:[], visible:true, status:"pending" }
+      ],
+      gifts: [
+        { id:1, name:"Kit de fraldas RN", source:"admin", claimed:false, byMe:false },
+        { id:2, name:"Mantinha de algodão", source:"admin", claimed:false, byMe:false }
+      ],
+      polls: [],
+      supplies: [
+        { id:1, name:"Bolo doce", needed:1, takenBy:[], source:"admin" }
+      ]
+    },
+    {
+      id: 3,
+      ownerId: "u3",                 // ← Pedro organiza · Maria é CONVIDADA (já confirmou)
+      name: "Churrasco de Confraternização",
+      date: "2026-06-20T12:00:00",
+      location: "Chácara do Pedro — Sobradinho, DF",
+      description: "Vem pro churrasco! Traga a família e o bom humor. 🔥",
+      emoji: "🍖",
+      show: { guests: true, gifts: false, polls: true, supplies: true },
+      supplySuggest: true,
+      guests: [
+        { id:1, name:"Pedro Santos", email:"pedro@ex.com", companions:0, dietary:[], visible:true, status:"confirmed" },
+        // Maria já CONFIRMOU presença neste evento
+        { id:2, userId:"u1", name:"Maria Brandão", email:"maria@eventbday.app", companions:1, dietary:["Sem lactose"], visible:true, status:"confirmed" },
+        { id:3, name:"Rafa Dias", email:"rafa@ex.com", companions:0, dietary:[], visible:true, status:"confirmed" }
+      ],
+      gifts: [],
+      polls: [
+        { id:1, question:"Qual carne não pode faltar?", options:[
+          { id:"a", label:"Picanha",      votes:12 },
+          { id:"b", label:"Costela",      votes:6 },
+          { id:"c", label:"Linguiça",     votes:4 }
+        ], active:true, userVote:null }
+      ],
+      supplies: [
+        { id:1, name:"Carvão",      needed:2, takenBy:[],               source:"admin" },
+        { id:2, name:"Cerveja",     needed:5, takenBy:["Rafa Dias"],    source:"admin" },
+        { id:3, name:"Gelo",        needed:2, takenBy:["Maria Brandão"],source:"guest" }
+      ]
+    }
+  ],
+  activeEventId: 1,
+  // sessão atual
+  currentGuestName: null,
+  activeTab: "gifts",
+  preview: false          // organizador pré-visualizando o evento como convidado
+};
+// usuário logado
+function currentUser(){ return state.users[state.currentUserId]; }
+// acessor do evento ativo
+function activeEv(){ return state._events.find(e => e.id === state.activeEventId) || state._events[0]; }
+// relação do usuário logado com um evento
+function isOrganizer(e){ return e.ownerId === state.currentUserId; }
+function myInvite(e){ return e.guests.find(g => g.userId === state.currentUserId); }
+function eventsIOrganize(){ return state._events.filter(isOrganizer); }
+function eventsImInvitedTo(){ return state._events.filter(e => !isOrganizer(e) && myInvite(e)); }
+// getters/setters que apontam para o evento ativo (mantêm o código de telas intacto)
+Object.defineProperties(state, {
+  event:    { get(){ return activeEv(); } },
+  guests:   { get(){ return activeEv().guests;   }, set(v){ activeEv().guests = v;   } },
+  gifts:    { get(){ return activeEv().gifts;    }, set(v){ activeEv().gifts = v;    } },
+  polls:    { get(){ return activeEv().polls;    }, set(v){ activeEv().polls = v;    } },
+  supplies: { get(){ return activeEv().supplies; }, set(v){ activeEv().supplies = v; } }
+});
+window.state = state; // exposto para inspeção
+
+/* ── UTILIDADES ────────────────────────────────────────────── */
+const $  = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+const esc = (s="") => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+const AV_COLORS = ["#E8553A","#E84C82","#F2A93B","#7A5AE0","#1F8A5B","#2A6FDB"];
+const avatarColor = (name) => {
+  let h=0; for(const c of name) h=(h*31+c.charCodeAt(0))>>>0;
+  return AV_COLORS[h % AV_COLORS.length];
+};
+const initials = (name) => name.trim().split(/\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase();
+
+// Um presente "vai ser levado" se foi reivindicado (admin sugerido + alguém pegou) ou se um convidado o adicionou
+const giftBeingBrought = (g) => g.claimed || g.source === "guest";
+
+const MESES = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+function formatDate(iso){
+  const d = new Date(iso);
+  const h = String(d.getHours()).padStart(2,"0");
+  const m = String(d.getMinutes()).padStart(2,"0");
+  return `${d.getDate()} de ${MESES[d.getMonth()]} de ${d.getFullYear()} · ${h}h${m}`;
+}
+
+/* ── ROTEADOR ──────────────────────────────────────────────── */
+function showScreen(id){
+  $$(".screen").forEach(s => s.classList.toggle("active", s.id === id));
+
+  // a navbar só aparece quando logado (fora da tela de entrada)
+  const loggedView = (id !== "screen-login");
+  $("#topbar").style.display = loggedView ? "" : "none";
+  document.body.classList.toggle("is-login", id === "screen-login");
+
+  // banner de pré-visualização (organizador vendo como convidado)
+  const inPreview = state.preview && (id === "screen-event" || id === "screen-guest" || id === "screen-rsvp" || id === "screen-success");
+  $("#preview-banner").classList.toggle("show", inPreview);
+  document.body.classList.toggle("has-preview-banner", inPreview);
+
+  // destaque do "Início" na navbar — ativo na home
+  $$(".nav-link").forEach(l => l.classList.toggle("active", l.dataset.nav === id));
+
+  // re-renderiza a tela alvo a partir do estado
+  if (id === "screen-home")   renderHome();
+  if (id === "screen-event")  renderEvent();
+  if (id === "screen-guest")  renderGuestArea();
+  if (id === "screen-manage") renderManage();
+  window.scrollTo({top:0, behavior:"smooth"});
+  closeAccountMenu();
+}
+window.showScreen = showScreen;
+
+/* ── SESSÃO / CONTA ────────────────────────────────────────── */
+function renderAccount(){
+  const u = currentUser();
+  $("#account-av").textContent = initials(u.name);
+  $("#account-av").style.background = avatarColor(u.name);
+  $("#account-name").textContent = u.name.split(" ")[0];
+  $("#account-menu-av").textContent = initials(u.name);
+  $("#account-menu-av").style.background = avatarColor(u.name);
+  $("#account-menu-name").textContent = u.name;
+  $("#account-menu-email").textContent = u.email;
+}
+function goHome(){ if(!state.loggedIn) return; state.preview = false; showScreen("screen-home"); }
+function logout(){
+  state.loggedIn = false;
+  closeAccountMenu();
+  showScreen("screen-login");
+}
+let authMode = "signin";
+function setAuthMode(m){
+  authMode = m;
+  $$(".login-tab").forEach(t => t.classList.toggle("active", t.dataset.auth === m));
+  $("#login-name-field").style.display = m === "signup" ? "" : "none";
+  $("#login-title").textContent = m === "signup" ? "Vamos começar 🎈" : "Bem-vinda de volta 👋";
+  $("#login-lede").textContent  = m === "signup" ? "Crie sua conta para organizar e receber convites." : "Entre para ver seus eventos e convites.";
+  $("#login-submit").textContent = m === "signup" ? "Criar conta →" : "Entrar →";
+}
+function doLogin(ev){
+  ev.preventDefault();
+  // DEMO: entra sempre como Maria (usuário u1). SUPABASE: autenticar e carregar o usuário real.
+  state.currentUserId = "u1";
+  state.loggedIn = true;
+  renderAccount();
+  showScreen("screen-home");
+}
+function toggleAccountMenu(ev){
+  if(ev) ev.stopPropagation();
+  $("#account").classList.toggle("open");
+}
+function closeAccountMenu(){ $("#account")?.classList.remove("open"); }
+document.addEventListener("click", e => { if(!e.target.closest("#account")) closeAccountMenu(); });
+Object.assign(window,{goHome,logout,setAuthMode,doLogin,toggleAccountMenu});
+
+/* ── ABRIR EVENTO (roteamento por relação) ─────────────────────
+   Organizo → tela de gestão · Fui convidado → página do evento.  */
+function openEvent(id){
+  state.activeEventId = id;
+  state.preview = false;
+  const e = activeEv();
+  if (isOrganizer(e)){ showScreen("screen-manage"); return; }
+  // convidado: se já confirmou presença, vai direto para a área do convidado
+  state.currentGuestName = currentUser().name;
+  const inv = myInvite(e);
+  if (inv && inv.status === "confirmed"){ showScreen("screen-guest"); }
+  else { showScreen("screen-event"); }
+}
+// organizador pré-visualiza o próprio evento como convidado
+function previewAsGuest(){ state.preview = true; state.currentGuestName = currentUser().name; showScreen("screen-event"); }
+function backToManage(){ state.preview = false; showScreen("screen-manage"); }
+Object.assign(window,{openEvent,previewAsGuest,backToManage});
+
+/* ════════════ TELA 1 · EVENTO PÚBLICO ════════════ */
+function renderEvent(){
+  const ev = state.event;
+  // SUPABASE: buscar evento + convidados visíveis confirmados
+  const visibles = state.guests.filter(g => g.visible && g.status === "confirmed");
+  const totalPeople = state.guests.filter(g=>g.status==="confirmed").reduce((n,g)=>n+1+g.companions,0);
+
+  const confettiColors = ["var(--coral)","var(--amber)","var(--pink)","var(--coral)","var(--amber)","var(--pink)","#7A5AE0"];
+  let confetti = "";
+  const seeds = [[6,12,-18],[16,82,24],[34,46,8],[58,8,-12],[72,90,30],[88,30,-22],[44,70,14],[24,24,40]];
+  seeds.forEach((s,i)=>{ confetti += `<i style="top:${s[0]}%;left:${s[1]}%;background:${confettiColors[i%confettiColors.length]};transform:rotate(${s[2]}deg)"></i>`; });
+
+  const guestChips = visibles.length
+    ? visibles.map(g => `<div class="guest-chip"><span class="avatar" style="background:${avatarColor(g.name)}">${initials(g.name)}</span>${esc(g.name)}${g.companions>0?` <span class="muted" style="font-weight:600">+${g.companions}</span>`:""}</div>`).join("")
+    : `<p class="guest-empty">Seja o primeiro a confirmar presença! 🎉</p>`;
+
+  // Prévia pública da lista de presentes — sugestões do organizador x o que convidados vão levar (anônimo)
+  const giftPreview = state.gifts.map(g => {
+    const bring = giftBeingBrought(g);
+    return `
+    <div class="gift-mini">
+      <span class="gift-mini-name">${esc(g.name)}</span>
+      ${bring
+        ? `<span class="gtag bring"><span class="d"></span>Alguém vai levar</span>`
+        : `<span class="gtag suggest"><span class="d"></span>Sugestão</span>`}
+    </div>`; }).join("");
+
+  const show = ev.show;
+  const guestCardHTML = show.guests ? `
+        <div class="card pad guest-card">
+          <div class="row-between" style="margin-bottom:16px;">
+            <h2 class="section-title" style="font-size:19px;">Lista de convidados</h2>
+            <span class="status free"><span class="d"></span>${visibles.length}</span>
+          </div>
+          <div class="guest-strip">${guestChips}</div>
+          <p class="guest-count-note">${totalPeople} pessoa(s) confirmada(s), incluindo acompanhantes.</p>
+        </div>` : "";
+  const giftCardHTML = show.gifts ? `
+        <div class="card pad gift-card">
+          <div class="row-between" style="margin-bottom:6px;">
+            <h2 class="section-title" style="font-size:19px;">Lista de presentes</h2>
+            <span class="anon-tag">🕶️ anônimo</span>
+          </div>
+          <p class="muted" style="font-size:13.5px;margin-bottom:12px;">Quem reservou um presente fica anônimo.</p>
+          <div class="gift-mini-list">${giftPreview}</div>
+          <button class="btn ghost" style="margin-top:10px;padding-left:0;" onclick="showScreen('screen-guest')">Reservar um presente →</button>
+        </div>` : "";
+  const rightCol = (guestCardHTML || giftCardHTML)
+    ? `<div class="col-right">${guestCardHTML}${giftCardHTML}</div>` : "";
+
+  $("#screen-event").innerHTML = `
+    <div class="event-layout ${rightCol?'':'solo'}">
+      <!-- CAPA DO EVENTO -->
+      <div class="hero cover">
+        <div class="confetti">${confetti}</div>
+        <div class="hero-grid">
+          <span class="event-pill">${ev.emoji||"🎉"} Você foi convidado(a) para:</span>
+          <h1 class="event-name">${esc(ev.name)}</h1>
+          <p class="event-desc">${esc(ev.description)}</p>
+          <div class="event-meta">
+            <div class="meta-item">
+              <span class="meta-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span>
+              <span><span class="lab">Quando</span><span class="val">${formatDate(ev.date)}</span></span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>
+              <span><span class="lab">Onde</span><span class="val">${esc(ev.location)}</span></span>
+            </div>
+          </div>
+          <div class="countdown" id="countdown"></div>
+          <!-- CTA dentro do convite — aparece só no mobile -->
+          <button class="btn confirm-cta-inline" onclick="goToRsvp()">Confirmar presença →</button>
+        </div>
+      </div>
+
+      <!-- COLUNA DIREITA: lista de convidados + lista de presentes -->
+      ${rightCol}
+    </div>
+
+    <!-- CONFIRMAR PRESENÇA (barra full-width) — desktop -->
+    <button class="btn confirm-cta" onclick="goToRsvp()">Confirmar presença →</button>`;
+
+  startCountdown();
+}
+
+function goToRsvp(){ openRsvp(); }
+window.goToRsvp = goToRsvp;
+
+/* contador regressivo em tempo real */
+let cdTimer = null;
+function startCountdown(){
+  if (cdTimer) clearInterval(cdTimer);
+  const target = new Date(state.event.date).getTime();
+  const tick = () => {
+    const box = $("#countdown");
+    if (!box) { clearInterval(cdTimer); return; }
+    const diff = target - Date.now();
+    if (diff <= 0){
+      box.innerHTML = `<div class="cd-done">🎉 A festa começou! Bem-vindo(a)!</div>`;
+      clearInterval(cdTimer); return;
+    }
+    const d = Math.floor(diff/86400000);
+    const h = Math.floor(diff%86400000/3600000);
+    const m = Math.floor(diff%3600000/60000);
+    const s = Math.floor(diff%60000/1000);
+    const cell = (n,l)=>`<div class="cd-box"><div class="cd-num">${String(n).padStart(2,"0")}</div><div class="cd-lab">${l}</div></div>`;
+    box.innerHTML = cell(d,"Dias")+cell(h,"Horas")+cell(m,"Min")+cell(s,"Seg");
+  };
+  tick();
+  cdTimer = setInterval(tick, 1000);
+}
+
+/* ════════════ TELA 2 · RSVP — WIZARD EM MODAIS ════════════
+   Cada pergunta é um passo (modal). O usuário avança um a um:
+   1) Seus dados  2) Acompanhantes  3) Restrições  4) Lista de presentes  */
+const rsvp = { step:0, name:"", email:"", companionNames:[], dietary:[], visible:true, giftId:null, giftCustom:"", errName:false, errEmail:false, errComp:false };
+
+const DIET_OPTS = ["Vegetariano","Vegano","Sem glúten","Sem lactose","Outro"];
+const RSVP_STEPS = ["Seus dados","Acompanhantes","Restrições alimentares","Lista de presentes"];
+
+function openRsvp(){
+  // pré-preenche com os dados do usuário logado (multi-tenant: o convidado é um usuário)
+  const u = currentUser();
+  const inv = myInvite(activeEv());
+  rsvp.step=0; rsvp.name=u.name; rsvp.email=u.email; rsvp.companionNames=[]; rsvp.dietary=inv?[...(inv.dietary||[])]:[];
+  rsvp.visible= inv? inv.visible : true; rsvp.giftId=null; rsvp.giftCustom=""; rsvp.errName=false; rsvp.errEmail=false; rsvp.errComp=false;
+  showScreen("screen-rsvp");
+  renderRsvp();
+}
+window.openRsvp = openRsvp;
+
+const emailValid = (e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+
+function renderRsvp(){
+  const step = rsvp.step;
+  const dots = RSVP_STEPS.map((_,i)=>`<span class="wz-dot ${i===step?'on':''} ${i<step?'done':''}"></span>`).join("");
+
+  let body = "";
+  if (step===0){
+    body = `
+      <div class="wz-field ${rsvp.errName?'invalid':''}">
+        <label>Nome completo <span class="req">*</span></label>
+        <input type="text" id="wz-name" placeholder="Ex.: Joana da Silva" value="${esc(rsvp.name)}" oninput="rsvp.name=this.value;rsvp.errName=false;this.closest('.wz-field').classList.remove('invalid')" />
+        <div class="err">Por favor, informe seu nome completo.</div>
+      </div>
+      <div class="wz-field ${rsvp.errEmail?'invalid':''}">
+        <label>E-mail <span class="req">*</span></label>
+        <input type="email" id="wz-email" placeholder="voce@email.com" value="${esc(rsvp.email)}" oninput="rsvp.email=this.value;rsvp.errEmail=false;this.closest('.wz-field').classList.remove('invalid')" />
+        <div class="err">${rsvp.email && !emailValid(rsvp.email) ? "Informe um e-mail válido." : "Por favor, informe seu e-mail."}</div>
+      </div>`;
+  }
+  else if (step===1){
+    const rows = rsvp.companionNames.map((nm,i)=>`
+      <div class="comp-row">
+        <span class="comp-num">${i+1}</span>
+        <input type="text" placeholder="Nome do acompanhante" value="${esc(nm)}" oninput="rsvp.companionNames[${i}]=this.value;rsvp.errComp=false" />
+        <button class="comp-del" title="Remover" onclick="removeCompanion(${i})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>`).join("");
+    body = `
+      <p class="wz-help">Vai levar acompanhantes? Adicione o nome de cada um — assim a lista fica completa. 🙌</p>
+      <div class="comp-list ${rsvp.errComp?'invalid':''}">${rows || `<p class="comp-empty">Você vai sozinho(a) por enquanto.</p>`}</div>
+      ${rsvp.errComp?`<div class="err" style="display:block;margin-top:4px;">Preencha o nome de todos os acompanhantes (ou remova os vazios).</div>`:``}
+      <button class="add-comp ${rsvp.companionNames.length>=5?'is-disabled':''}" onclick="addCompanion()">+ Convidado / agregado</button>
+
+      <div class="vis-q">
+        <p class="vis-label">Aceita que seu nome + convidados apareçam na lista pública de convidados?</p>
+        <div class="vis-opts">
+          <button class="vis-opt ${rsvp.visible?'on':''}" onclick="rsvp.visible=true;renderRsvp()"><span class="vis-radio"></span>Sim</button>
+          <button class="vis-opt ${!rsvp.visible?'on':''}" onclick="rsvp.visible=false;renderRsvp()"><span class="vis-radio"></span>Não</button>
+        </div>
+      </div>`;
+  }
+  else if (step===2){
+    body = `
+      <p class="wz-help">Tem alguma restrição alimentar? Marque todas que se aplicam (opcional).</p>
+      <div class="check-grid">
+        ${DIET_OPTS.map(d=>`
+          <label class="chk ${rsvp.dietary.includes(d)?'on':''}">
+            <input type="checkbox" ${rsvp.dietary.includes(d)?'checked':''} onchange="toggleDiet('${d}',this.checked)" /> ${d}
+          </label>`).join("")}
+      </div>`;
+  }
+  else if (step===3){
+    const avail = state.gifts.filter(g=> g.source==="admin" && !giftBeingBrought(g));
+    body = `
+      <p class="wz-help">O que você vai levar? Escolha uma sugestão do organizador ou adicione o seu próprio presente. A escolha é anônima e é opcional.</p>
+      <div class="gift-pick">
+        <button class="gift-opt ${rsvp.giftId===null && !rsvp.giftCustom.trim()?'on':''}" onclick="rsvp.giftId=null;rsvp.giftCustom='';renderRsvp()">
+          <span class="gp-radio"></span><span class="gp-name">Não vou levar presente agora</span>
+        </button>
+        ${avail.length?`<div class="gp-group-label">Sugestões do organizador</div>`:``}
+        ${avail.map(g=>`
+          <button class="gift-opt ${rsvp.giftId===g.id?'on':''}" onclick="rsvp.giftId=${g.id};rsvp.giftCustom='';renderRsvp()">
+            <span class="gp-radio"></span><span class="gp-name">${esc(g.name)}</span><span class="gtag suggest"><span class="d"></span>Sugestão</span>
+          </button>`).join("")}
+      </div>
+      <div class="gp-custom">
+        <label class="gp-custom-label">Ou diga o que você vai levar</label>
+        <input type="text" id="wz-gift" placeholder="Ex.: Caixa de bombons artesanais" value="${esc(rsvp.giftCustom)}" oninput="rsvp.giftCustom=this.value;if(this.value.trim())rsvp.giftId=null;syncGiftPick()" />
+      </div>`;
+  }
+
+  const isLast = step === RSVP_STEPS.length-1;
+  $("#rsvp-modal").innerHTML = `
+    <div class="wz-head">
+      <div>
+        <span class="wz-eyebrow">Confirmar presença · Passo ${step+1} de ${RSVP_STEPS.length}</span>
+        <h2 class="wz-title">${RSVP_STEPS[step]}</h2>
+      </div>
+      <button class="wz-close" onclick="showScreen('screen-event')" title="Fechar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="wz-dots">${dots}</div>
+    <div class="wz-body" key="${step}">${body}</div>
+    <div class="wz-foot">
+      <button class="btn secondary" onclick="rsvpBack()">${step===0?'Cancelar':'← Voltar'}</button>
+      <button class="btn" style="flex:1;" onclick="rsvpNext()">${isLast?'Confirmar presença 🎉':'Continuar →'}</button>
+    </div>`;
+
+  if (step===0) setTimeout(()=>$("#wz-name")?.focus(), 60);
+}
+
+function addCompanion(){ if(rsvp.companionNames.length>=5) return; rsvp.companionNames.push(""); renderRsvp(); }
+function removeCompanion(i){ rsvp.companionNames.splice(i,1); renderRsvp(); }
+function toggleDiet(d,on){ if(on){ if(!rsvp.dietary.includes(d)) rsvp.dietary.push(d); } else { rsvp.dietary = rsvp.dietary.filter(x=>x!==d); } }
+// atualiza seleção visual sem re-render (preserva foco do input de presente custom)
+function syncGiftPick(){
+  const hasCustom = rsvp.giftCustom.trim().length>0;
+  $$(".gift-pick .gift-opt").forEach(btn=>{
+    const isNone = /Não vou levar/.test(btn.textContent);
+    btn.classList.toggle("on", !hasCustom && ((isNone && rsvp.giftId===null) || false));
+  });
+}
+Object.assign(window,{addCompanion,removeCompanion,toggleDiet,syncGiftPick});
+
+function rsvpBack(){
+  if (rsvp.step===0){ showScreen("screen-event"); return; }
+  rsvp.step--; renderRsvp();
+}
+window.rsvpBack = rsvpBack;
+
+function rsvpNext(){
+  // validação por passo
+  if (rsvp.step===0){
+    rsvp.errName  = !rsvp.name.trim();
+    rsvp.errEmail = !emailValid(rsvp.email.trim());
+    if (rsvp.errName || rsvp.errEmail){ renderRsvp(); return; }
+  }
+  if (rsvp.step===1){
+    // nomes de acompanhantes obrigatórios quando adicionados
+    if (rsvp.companionNames.some(n=>!n.trim())){ rsvp.errComp = true; renderRsvp(); return; }
+  }
+  if (rsvp.step < RSVP_STEPS.length-1){ rsvp.step++; renderRsvp(); return; }
+
+  // ── último passo: confirmar ──
+  const names = rsvp.companionNames.map(n=>n.trim()).filter(Boolean);
+  const u = currentUser();
+  const existing = myInvite(activeEv());   // o convite do usuário logado já existe?
+  let guest;
+  if (existing){
+    // multi-tenant: atualiza o convite EXISTENTE deste usuário (não cria duplicata)
+    existing.name = rsvp.name.trim() || u.name;
+    existing.email = rsvp.email.trim() || u.email;
+    existing.companions = names.length;
+    existing.companionNames = names;
+    existing.dietary = [...rsvp.dietary];
+    existing.visible = rsvp.visible;
+    existing.status = "confirmed";       // SUPABASE: atualizar convite -> confirmado
+    guest = existing;
+  } else {
+    guest = {
+      id: Date.now(),
+      userId: u.id,
+      name: rsvp.name.trim(),
+      email: rsvp.email.trim(),
+      companions: names.length,
+      companionNames: names,
+      dietary: [...rsvp.dietary],
+      visible: rsvp.visible,
+      status: "confirmed"
+    };
+    state.guests.push(guest); // SUPABASE: inserir convidado (+ acompanhantes)
+  }
+  state.currentGuestName = guest.name;
+
+  // presente escolhido no fluxo (anônimo): sugestão do organizador OU presente próprio do convidado
+  if (rsvp.giftCustom.trim()){
+    // SUPABASE: inserir presente trazido pelo convidado
+    state.gifts.push({ id:Date.now()+1, name:rsvp.giftCustom.trim(), source:"guest", claimed:true, byMe:true });
+  } else if (rsvp.giftId !== null){
+    const g = state.gifts.find(x=>x.id===rsvp.giftId);
+    if (g){ g.claimed = true; g.byMe = true; } // SUPABASE: marcar sugestão como reivindicada (anônimo)
+  }
+
+  $("#success-title").textContent = `Obrigado, ${guest.name.split(" ")[0]}! 🥳`;
+  $("#success-sub").textContent = `Sua presença em "${state.event.name}" está confirmada${names.length?` (com ${names.length} acompanhante${names.length>1?'s':''})`:''}. Mal podemos esperar para te ver!`;
+  showScreen("screen-success");
+}
+window.rsvpNext = rsvpNext;
+
+/* ════════════ TELA 4 · ÁREA DO CONVIDADO ════════════ */
+function showTab(tab){
+  state.activeTab = tab;
+  $$(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
+  $$(".tabpanel").forEach(p => p.classList.toggle("active", p.id === `tab-${tab}`));
+}
+window.showTab = showTab;
+
+function renderGuestArea(){
+  const show = activeEv().show;
+  // contexto do evento no topo (útil ao chegar direto de um convite confirmado)
+  const ev = activeEv();
+  const inv = myInvite(ev);
+  $("#guest-eyebrow").textContent = inv && inv.status==="confirmed" ? "Presença confirmada · Área do convidado" : "Área do convidado";
+  $("#guest-title").innerHTML = `${ev.emoji||"🎉"} ${esc(ev.name)}`;
+  // mostra/oculta abas conforme a visibilidade definida pelo organizador
+  $(".tab[data-tab='gifts']").style.display = show.gifts ? "" : "none";
+  $(".tab[data-tab='polls']").style.display = show.polls ? "" : "none";
+  $(".tab[data-tab='supplies']").style.display = show.supplies ? "" : "none";
+  // garante uma aba ativa válida
+  const allowed = ["gifts","polls","supplies"].filter(t => show[t]);
+  if (!allowed.includes(state.activeTab)) state.activeTab = allowed[0] || "gifts";
+  renderGifts(); renderPolls(); renderSupplies();
+  showTab(state.activeTab);
+}
+
+/* Seção A · Presentes */
+function renderGifts(){
+  // SUPABASE: buscar presentes (sugestões do organizador + os que convidados vão levar)
+  $("#tab-gifts").innerHTML = `
+    <p class="muted" style="font-size:14.5px;margin-bottom:14px;">Escolha uma sugestão do organizador para levar, ou adicione o presente que <b>você</b> vai trazer. Quem leva fica anônimo para os outros.</p>
+    <div class="add-gift-bar">
+      <input type="text" id="guest-gift" placeholder="O que você vai levar? Ex.: Caixa de bombons" onkeydown="if(event.key==='Enter')addGuestGift()" />
+      <button class="btn sm" onclick="addGuestGift()">+ Vou levar isso</button>
+    </div>
+    <div class="grid-cards">
+      ${state.gifts.map(g => {
+        const bring = giftBeingBrought(g);
+        const tag = g.byMe
+          ? `<span class="gtag mine"><span class="d"></span>Você vai levar</span>`
+          : bring
+            ? `<span class="gtag bring"><span class="d"></span>Alguém vai levar</span>`
+            : `<span class="gtag suggest"><span class="d"></span>Sugestão do organizador</span>`;
+        return `
+        <div class="card gift ${bring?'reserved':''}">
+          <div class="gift-top">
+            <span class="gift-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="1"/><path d="M12 8v13M3 12h18M12 8S9 2 6.5 3.5 9 8 12 8s5.5.5 5.5-3S14 8 12 8Z"/></svg></span>
+            ${tag}
+          </div>
+          <div class="gift-name">${esc(g.name)}</div>
+          ${g.byMe
+            ? `<button class="btn secondary sm" onclick="undoGift(${g.id})">Não vou mais levar</button>`
+            : bring
+              ? `<button class="btn secondary sm" disabled>Já tem quem leve</button>`
+              : `<button class="btn sm" onclick="reserveGift(${g.id})">Vou levar este</button>`}
+        </div>`; }).join("")}
+    </div>`;
+}
+function reserveGift(id){
+  const g = state.gifts.find(x=>x.id===id);
+  if (g){ g.claimed = true; g.byMe = true; } // SUPABASE: marcar sugestão como reivindicada (sem expor quem)
+  renderGifts(); renderEventIfActive(); renderAdminIfActive();
+}
+function undoGift(id){
+  const g = state.gifts.find(x=>x.id===id);
+  if (!g) return;
+  if (g.source==="guest"){ state.gifts = state.gifts.filter(x=>x.id!==id); } // presente próprio: remove
+  else { g.claimed = false; g.byMe = false; }                                // sugestão: volta a estar livre
+  renderGifts(); renderEventIfActive(); renderAdminIfActive();
+}
+function addGuestGift(){
+  const inp = $("#guest-gift"); const name = inp.value.trim(); if(!name) return;
+  // SUPABASE: inserir presente trazido pelo convidado
+  state.gifts.push({ id:Date.now(), name, source:"guest", claimed:true, byMe:true });
+  renderGifts(); renderEventIfActive(); renderAdminIfActive();
+}
+Object.assign(window,{reserveGift,undoGift,addGuestGift});
+
+/* Seção B · Enquetes */
+function renderPolls(){
+  // SUPABASE: buscar enquetes ativas
+  const active = state.polls.filter(p=>p.active);
+  $("#tab-polls").innerHTML = active.length ? active.map(p => {
+    const total = p.options.reduce((n,o)=>n+o.votes,0);
+    const voted = p.userVote !== null;
+    return `
+    <div class="card poll ${voted?'voted':''}" data-poll="${p.id}">
+      <div class="voted-tag">✓ Você já votou nesta enquete</div>
+      <div class="poll-q">${esc(p.question)}</div>
+      ${p.options.map(o => {
+        const pct = total ? Math.round(o.votes/total*100) : 0;
+        const picked = p.userVote === o.id;
+        return `
+        <div class="poll-opt ${picked?'picked':''}" onclick="vote(${p.id},'${o.id}')">
+          <div class="bar-fill" style="width:${voted?pct:0}%"></div>
+          <div class="label-row">
+            <input type="radio" name="poll-${p.id}" ${picked?'checked':''} ${voted?'disabled':''} />
+            <span class="opt-label">${esc(o.label)}</span>
+            ${voted?`<span class="pct">${pct}%</span>`:``}
+          </div>
+        </div>`;
+      }).join("")}
+      <div class="poll-foot">${voted?`${total} voto(s) no total`:`Clique em uma opção para votar`}</div>
+    </div>`;
+  }).join("") : `<div class="card pad muted">Nenhuma enquete ativa no momento.</div>`;
+}
+function vote(pollId, optId){
+  const p = state.polls.find(x=>x.id===pollId);
+  if (!p || p.userVote !== null) return;   // bloqueia re-votação
+  const o = p.options.find(x=>x.id===optId);
+  if (!o) return;
+  o.votes += 1;
+  p.userVote = optId;
+  // SUPABASE: registrar voto
+  renderPolls();
+}
+window.vote = vote;
+
+/* Seção C · Insumos */
+function renderSupplies(){
+  const e = activeEv();
+  const me = state.currentGuestName || "Você";
+  const suggestBar = e.supplySuggest ? `
+    <div class="add-gift-bar">
+      <input type="text" id="guest-supply" placeholder="Sugerir um insumo. Ex.: Gelo" onkeydown="if(event.key==='Enter')addGuestSupply()" />
+      <button class="btn sm" onclick="addGuestSupply()">+ Sugerir insumo</button>
+    </div>` : "";
+
+  $("#tab-supplies").innerHTML = `
+    <p class="muted" style="font-size:14.5px;margin-bottom:16px;">Itens que precisam ser levados. Inscreva-se nas vagas abertas${e.supplySuggest?" ou sugira um novo item":""}.</p>
+    ${suggestBar}
+    ${state.supplies.length ? state.supplies.map(s => {
+      const count = s.takenBy.length;
+      const done  = count >= s.needed;
+      const mine  = s.takenBy.includes(me);
+      const dots  = Array.from({length:s.needed},(_,i)=>`<span class="slot-dot ${i<count?'filled':''}"></span>`).join("");
+      return `
+      <div class="supply ${done?'is-done':''}">
+        <span class="qty">${s.needed}</span>
+        <div class="s-main">
+          <div class="s-name">${esc(s.name)}${s.source==="guest"?` <span class="gtag mine" style="margin-left:4px;"><span class="d"></span>sugerido</span>`:""}</div>
+          <div class="s-meta">
+            <span class="slot-dots">${dots}</span>
+            <span>${count} de ${s.needed} inscrito(s)</span>
+          </div>
+        </div>
+        <div class="spacer"></div>
+        ${mine
+          ? `<button class="btn secondary sm" onclick="leaveSupply(${s.id})">Cancelar inscrição</button>`
+          : done
+            ? `<span class="taken-by"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Completo</span>`
+            : `<button class="btn sm" onclick="takeSupply(${s.id})">Me inscrever</button>`}
+      </div>`; }).join("") : `<p class="muted" style="font-size:14.5px;">Nenhum insumo na lista ainda.</p>`}`;
+}
+function takeSupply(id){
+  const s = state.supplies.find(x=>x.id===id);
+  const me = state.currentGuestName || "Você";
+  if (s && s.takenBy.length < s.needed && !s.takenBy.includes(me)){ s.takenBy.push(me); } // preenche uma vaga
+  // SUPABASE: inscrever pessoa no insumo
+  renderSupplies(); renderAdminIfActive();
+}
+function leaveSupply(id){
+  const s = state.supplies.find(x=>x.id===id);
+  const me = state.currentGuestName || "Você";
+  if (s){ s.takenBy = s.takenBy.filter(n=>n!==me); } // SUPABASE: remover inscrição
+  renderSupplies(); renderAdminIfActive();
+}
+function addGuestSupply(){
+  if (!activeEv().supplySuggest) return;
+  const inp=$("#guest-supply"); const name=inp.value.trim(); if(!name) return;
+  // SUPABASE: inserir insumo sugerido pelo convidado
+  state.supplies.push({ id:Date.now(), name, needed:1, takenBy:[], source:"guest" });
+  renderSupplies(); renderAdminIfActive();
+}
+Object.assign(window,{takeSupply,leaveSupply,addGuestSupply});
+
+/* ════════════ TELA 5 · PAINEL DO ORGANIZADOR ════════════ */
+function renderAdminIfActive(){ if ($("#screen-manage").classList.contains("active")) renderManage(); }
+function renderEventIfActive(){ if ($("#screen-event").classList.contains("active")) renderEvent(); }
+
+/* ── ÍCONES (admin) ─────────────────────────────────────────── */
+const ADM_I = {
+  users:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>`,
+  check:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>`,
+  gift:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="1"/><path d="M12 8v13M3 12h18"/></svg>`,
+  poll:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6"/><rect x="13" y="7" width="3" height="10"/></svg>`,
+  pin:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>`,
+  cal:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>`,
+  edit:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>`,
+  box:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5Z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>`,
+  eye:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`
+};
+
+/* ════════════ ADMIN HOME · MEUS EVENTOS ════════════ */
+/* ════════════ HOME UNIFICADA · MEUS EVENTOS + CONVITES ════════════ */
+function renderHome(){
+  const u = currentUser();
+  const mine    = eventsIOrganize();
+  const invites = eventsImInvitedTo();
+
+  // ── cartões dos eventos que EU organizo ──
+  const organizedCards = mine.map(e => {
+    const people = e.guests.filter(g=>g.status==="confirmed").reduce((n,g)=>n+1+g.companions,0);
+    const pending = e.guests.filter(g=>g.status==="pending").length;
+    const sections = [
+      e.show.guests   ? `<span class="ev-flag">${ADM_I.users}</span>` : "",
+      e.show.gifts    ? `<span class="ev-flag">${ADM_I.gift}</span>`  : "",
+      e.show.polls    ? `<span class="ev-flag">${ADM_I.poll}</span>`  : "",
+      e.show.supplies ? `<span class="ev-flag">${ADM_I.box}</span>`   : ""
+    ].join("");
+    return `
+      <button class="ev-card" onclick="openEvent(${e.id})">
+        <div class="ev-cover" style="background:${coverGradient(e.name)}">
+          <span class="ev-emoji">${e.emoji||"🎉"}</span>
+          <span class="ev-role-tag organizer">Organizador</span>
+        </div>
+        <div class="ev-card-body">
+          <h3 class="ev-card-name">${esc(e.name)}</h3>
+          <div class="ev-card-meta">${ADM_I.cal}<span>${shortDate(e.date)}</span></div>
+          <div class="ev-card-foot">
+            <span class="ev-people">${ADM_I.users}<span>${people}</span>${pending?`<span class="ev-pending">${pending} pendente${pending>1?'s':''}</span>`:""}</span>
+            <span class="ev-flags">${sections || '<span class="ev-flag-none">privado</span>'}</span>
+          </div>
+        </div>
+      </button>`;
+  }).join("");
+
+  // ── cartões dos CONVITES que EU recebi ──
+  const inviteCards = invites.map(e => {
+    const host = state.users[e.ownerId]?.name || "Organizador";
+    const inv  = myInvite(e);
+    const st   = inv.status; // pending | confirmed | declined
+    const badge = st==="confirmed"
+        ? `<span class="inv-status confirmed">${ADM_I.check}Presença confirmada</span>`
+      : st==="declined"
+        ? `<span class="inv-status declined">Você recusou</span>`
+        : `<span class="inv-status pending">Convite pendente</span>`;
+    const actions = st==="pending"
+        ? `<button class="btn sm" onclick="event.stopPropagation();confirmInvite(${e.id})">Confirmar presença</button>
+           <button class="btn secondary sm" onclick="event.stopPropagation();declineInvite(${e.id})">Recusar</button>`
+      : st==="confirmed"
+        ? `<button class="btn secondary sm" onclick="event.stopPropagation();openEvent(${e.id})">Ver evento →</button>
+           <button class="btn ghost sm" onclick="event.stopPropagation();declineInvite(${e.id})">Não poderei ir</button>`
+        : `<button class="btn sm" onclick="event.stopPropagation();confirmInvite(${e.id})">Mudar resposta</button>`;
+    const extra = inv.companions>0 && st==="confirmed" ? ` · com ${inv.companions} acompanhante${inv.companions>1?'s':''}` : "";
+    return `
+      <div class="inv-card ${st}" onclick="openEvent(${e.id})">
+        <div class="inv-cover" style="background:${coverGradient(e.name)}"><span class="inv-emoji">${e.emoji||"🎉"}</span></div>
+        <div class="inv-body">
+          <div class="inv-top">
+            <div>
+              <h3 class="ev-card-name">${esc(e.name)}</h3>
+              <div class="inv-host"><span class="avatar inv-host-av" style="background:${avatarColor(host)}">${initials(host)}</span>Organizado por <b>${esc(host.split(" ")[0])}</b></div>
+            </div>
+            ${badge}
+          </div>
+          <div class="inv-meta">
+            <span>${ADM_I.cal}${shortDate(e.date)}</span>
+            <span>${ADM_I.pin}${esc(e.location)}</span>
+          </div>
+          ${st==="confirmed"&&extra?`<p class="inv-note">✓ Você confirmou${extra}.</p>`:""}
+          <div class="inv-actions">${actions}</div>
+        </div>
+      </div>`;
+  }).join("");
+
+  $("#screen-home").innerHTML = `
+    <header class="home-head">
+      <span class="eyebrow">Seu painel</span>
+      <h1 class="home-greeting">Olá, ${esc(u.name.split(" ")[0])} 👋</h1>
+      <p class="muted home-greeting-sub">Tudo o que você organiza e os convites que recebeu, em um só lugar.</p>
+    </header>
+
+    <section class="home-section">
+      <div class="home-section-head">
+        <div>
+          <h2 class="home-section-title">Eventos que organizo</h2>
+          <p class="home-section-sub">${mine.length} evento${mine.length!==1?'s':''} sob sua gestão</p>
+        </div>
+        <button class="btn sm" onclick="openEventModal()">+ Criar evento</button>
+      </div>
+      <div class="ev-grid">
+        <button class="ev-card ev-new" onclick="openEventModal()">
+          <span class="ev-new-plus">+</span>
+          <span class="ev-new-label">Criar evento</span>
+        </button>
+        ${organizedCards}
+      </div>
+    </section>
+
+    <section class="home-section">
+      <div class="home-section-head">
+        <div>
+          <h2 class="home-section-title">Convites recebidos</h2>
+          <p class="home-section-sub">Eventos para os quais você foi convidado(a)</p>
+        </div>
+      </div>
+      ${invites.length
+        ? `<div class="inv-grid">${inviteCards}</div>`
+        : `<div class="card pad muted home-empty">Você ainda não recebeu convites. Quando alguém te convidar para um evento, ele aparece aqui.</div>`}
+    </section>`;
+}
+
+/* ── ações dos convites (RSVP rápido no card) ── */
+function confirmInvite(id){
+  // abre o fluxo de RSVP já vinculado ao convite do usuário logado
+  openEvent(id);            // entra no evento como convidado
+  openRsvp();               // abre o wizard (pré-preenchido com os dados do usuário)
+}
+function declineInvite(id){
+  const e = state._events.find(x=>x.id===id);
+  const inv = e && myInvite(e);
+  if (inv){ inv.status = "declined"; } // SUPABASE: atualizar status do convite
+  renderHome();
+}
+Object.assign(window,{confirmInvite,declineInvite});
+function coverGradient(seed){
+  const base = avatarColor(seed||"x");
+  return `radial-gradient(120% 120% at 20% 0%, color-mix(in oklch,${base},white 18%), color-mix(in oklch,${base},black 14%))`;
+}
+function shortDate(iso){ const d=new Date(iso); return `${d.getDate()} ${MESES[d.getMonth()].slice(0,3)} ${d.getFullYear()}`; }
+function manageEvent(id){ state.activeEventId = id; state.preview = false; showScreen("screen-manage"); }
+// URL compartilhável (fictícia no protótipo). SUPABASE: usar slug/UUID público do evento
+function shareUrl(e){ return `https://eventbday.app/e/${e.id}`; }
+function copyShareUrl(){
+  const input = $("#share-url"); const btn = $("#share-copy-btn");
+  input.select();
+  const done = () => {
+    btn.classList.add("copied");
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Copiado!`;
+    setTimeout(()=>{ btn.classList.remove("copied"); btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar`; }, 1800);
+  };
+  if (navigator.clipboard?.writeText){ navigator.clipboard.writeText(input.value).then(done).catch(done); }
+  else { try{ document.execCommand("copy"); }catch(_){} done(); }
+}
+Object.assign(window,{manageEvent,copyShareUrl});
+
+/* ════════════ MODAL · CRIAR / EDITAR EVENTO ════════════ */
+let evDraftId = null;
+function openEventModal(id=null){
+  evDraftId = id;
+  const e = id ? state._events.find(x=>x.id===id) : null;
+  const d = e ? new Date(e.date) : null;
+  const dateVal = d ? `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}` : "";
+  const timeVal = d ? `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}` : "19:00";
+  const show = e ? e.show : { guests:true, gifts:true, polls:true, supplies:true };
+
+  $("#ev-modal").innerHTML = `
+    <div class="wz-head">
+      <div>
+        <span class="wz-eyebrow">${e?"Editar evento":"Novo evento"}</span>
+        <h2 class="wz-title">${e?"Editar capa do evento":"Criar evento"}</h2>
+      </div>
+      <button class="wz-close" onclick="closeEventModal()" title="Fechar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="ev-form">
+      <div class="ev-row">
+        <div class="wz-field" style="flex:0 0 84px;margin:0;">
+          <label>Emoji</label>
+          <input type="text" id="ev-emoji" maxlength="2" value="${esc(e?.emoji||"🎉")}" style="text-align:center;font-size:22px;" />
+        </div>
+        <div class="wz-field" style="flex:1;margin:0;" id="evf-name">
+          <label>Título do evento <span class="req">*</span></label>
+          <input type="text" id="ev-name" placeholder="Ex.: Aniversário da Maria" value="${esc(e?.name||"")}" />
+          <div class="err">Informe um título.</div>
+        </div>
+      </div>
+      <div class="wz-field" style="margin:0;">
+        <label>Descrição</label>
+        <input type="text" id="ev-desc" placeholder="Uma frase de convite..." value="${esc(e?.description||"")}" />
+      </div>
+      <div class="ev-row">
+        <div class="wz-field" style="flex:1;margin:0;" id="evf-date">
+          <label>Data <span class="req">*</span></label>
+          <input type="date" id="ev-date" value="${dateVal}" />
+          <div class="err">Informe a data.</div>
+        </div>
+        <div class="wz-field" style="flex:0 0 130px;margin:0;">
+          <label>Hora</label>
+          <input type="time" id="ev-time" value="${timeVal}" />
+        </div>
+      </div>
+      <div class="wz-field" style="margin:0;">
+        <label>Local</label>
+        <input type="text" id="ev-loc" placeholder="Endereço do evento" value="${esc(e?.location||"")}" />
+      </div>
+
+      <div class="ev-visblock">
+        <div class="ev-visblock-title">O que aparece para os convidados</div>
+        ${visToggleRow("guests","Lista de convidados",show.guests)}
+        ${visToggleRow("gifts","Lista de presentes",show.gifts)}
+        ${visToggleRow("polls","Enquetes",show.polls)}
+        ${visToggleRow("supplies","Lista de insumos",show.supplies)}
+      </div>
+    </div>
+    <div class="wz-foot">
+      <button class="btn secondary" onclick="closeEventModal()">Cancelar</button>
+      <button class="btn" style="flex:1;" onclick="saveEvent()">${e?"Salvar alterações":"Criar evento 🎉"}</button>
+    </div>`;
+  $("#ev-overlay").classList.add("open");
+  setTimeout(()=>$("#ev-name")?.focus(),60);
+}
+function visToggleRow(key,label,on){
+  return `
+    <label class="ev-vis-row">
+      <span class="ev-vis-label">${label}</span>
+      <span class="switch"><input type="checkbox" id="evv-${key}" ${on?"checked":""} /><span class="slider"></span></span>
+    </label>`;
+}
+function closeEventModal(){ $("#ev-overlay").classList.remove("open"); }
+function saveEvent(){
+  const name = $("#ev-name").value.trim();
+  const date = $("#ev-date").value;
+  const time = $("#ev-time").value || "19:00";
+  let ok = true;
+  if(!name){ $("#evf-name").classList.add("invalid"); ok=false; }
+  if(!date){ $("#evf-date").classList.add("invalid"); ok=false; }
+  if(!ok) return;
+
+  const payload = {
+    name,
+    emoji: $("#ev-emoji").value.trim() || "🎉",
+    description: $("#ev-desc").value.trim(),
+    date: `${date}T${time}:00`,
+    location: $("#ev-loc").value.trim() || "Local a definir",
+    show: { guests:$("#evv-guests").checked, gifts:$("#evv-gifts").checked, polls:$("#evv-polls").checked, supplies:$("#evv-supplies").checked }
+  };
+
+  if (evDraftId){
+    const e = state._events.find(x=>x.id===evDraftId);
+    Object.assign(e, payload); // SUPABASE: atualizar evento
+    closeEventModal(); renderManage();
+  } else {
+    const id = Date.now();
+    state._events.push({ id, ...payload, supplySuggest:true, guests:[], gifts:[], polls:[], supplies:[] }); // SUPABASE: inserir evento
+    state.activeEventId = id;
+    closeEventModal(); showScreen("screen-manage");
+  }
+}
+Object.assign(window,{openEventModal,closeEventModal,saveEvent});
+
+/* ════════════ ADMIN · GERENCIAR EVENTO ════════════ */
+function toggleSection(key){
+  const e = activeEv();
+  e.show[key] = !e.show[key]; // SUPABASE: atualizar visibilidade da seção
+  renderManage();
+  renderEventIfActive();
+}
+function deleteEvent(id){
+  if (state._events.length<=1){ alert("Você precisa ter ao menos um evento."); return; }
+  if (!confirm("Remover este evento e todos os seus dados?")) return;
+  state._events = state._events.filter(e=>e.id!==id); // SUPABASE: remover evento
+  state.activeEventId = state._events[0].id;
+  showScreen("screen-home");
+}
+Object.assign(window,{toggleSection,deleteEvent});
+
+function sectionCard(key,icon,title,desc,extra=""){
+  const on = activeEv().show[key];
+  return `
+    <div class="manage-card card ${on?'sec-on':'sec-off'}">
+      <div class="manage-card-radio" onclick="toggleSection('${key}')">
+        <span class="radio-dot ${on?'on':''}"></span>
+        <span>${on?"Aparece para os convidados":"Oculto dos convidados"}</span>
+      </div>
+      <div class="manage-card-head">
+        <span class="manage-ico">${icon}</span>
+        <div>
+          <h3 class="manage-card-title">${title}</h3>
+          <p class="manage-card-desc">${desc}</p>
+        </div>
+      </div>
+      ${extra}
+    </div>`;
+}
+
+function renderManage(){
+  const e = activeEv();
+  const total      = state.guests.length;
+  const confirmed  = state.guests.filter(g=>g.status==="confirmed").length;
+  const giftsCount = state.gifts.length;
+  const activePolls= state.polls.filter(p=>p.active).length;
+  const suppliesNeeded = state.supplies.reduce((n,s)=>n+s.needed,0);
+  const suppliesFilled = state.supplies.reduce((n,s)=>n+Math.min(s.takenBy.length,s.needed),0);
+  const metric = (ico,c,num,lab)=>`
+    <div class="card metric">
+      <div class="m-ico" style="background:color-mix(in oklch,${c},transparent 86%);color:${c}">${ico}</div>
+      <div class="m-num">${num}</div>
+      <div class="m-lab">${lab}</div>
+    </div>`;
+  const I = ADM_I;
+
+  $("#screen-manage").innerHTML = `
+    <button class="back-link" onclick="goHome()">← Meus eventos</button>
+    <div class="row-between" style="margin:6px 0 24px;">
+      <div>
+        <span class="eyebrow">Gerenciar evento</span>
+        <h1 class="section-title" style="font-size:32px;">${e.emoji||"🎉"} ${esc(e.name)}</h1>
+      </div>
+      <div class="manage-head-actions">
+        <button class="btn secondary sm" onclick="previewAsGuest()">${ADM_I.eye} Ver como convidado</button>
+        <button class="btn ghost sm danger-ghost" onclick="deleteEvent(${e.id})">Remover</button>
+      </div>
+    </div>
+
+    <!-- Link compartilhável — o organizador envia aos convidados -->
+    <div class="share-card card">
+      <div class="share-ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      </div>
+      <div class="share-main">
+        <div class="share-label">Link de convite</div>
+        <p class="share-hint">Compartilhe este link com seus convidados para que confirmem presença.</p>
+        <div class="share-row">
+          <input type="text" id="share-url" readonly value="${shareUrl(e)}" onclick="this.select()" />
+          <button class="btn sm share-copy" id="share-copy-btn" onclick="copyShareUrl()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copiar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Layout do esboço: capa + visibilidade das seções -->
+    <p class="manage-legend"><span class="radio-dot on"></span> Aparece &nbsp;·&nbsp; <span class="radio-dot"></span> Oculto — clique no rádio de cada cartão para alternar</p>
+    <div class="manage-grid">
+      <div class="manage-card card cover-card">
+        <div class="cover-card-top" style="background:${coverGradient(e.name)}">
+          <span class="ev-emoji big">${e.emoji||"🎉"}</span>
+        </div>
+        <div class="cover-card-body">
+          <h3 class="manage-card-title" style="font-size:20px;">${esc(e.name)}</h3>
+          <p class="manage-card-desc">${esc(e.description||"Sem descrição")}</p>
+          <div class="cover-meta">
+            <div>${I.cal}<span>${formatDate(e.date)}</span></div>
+            <div>${I.pin}<span>${esc(e.location)}</span></div>
+          </div>
+          <button class="btn sm" style="margin-top:16px;" onclick="openEventModal(${e.id})">${I.edit} Editar capa do evento</button>
+        </div>
+      </div>
+      ${sectionCard("guests",I.users,"Lista de convidados",`${confirmed} confirmado(s) · ${total} no total`)}
+      ${sectionCard("gifts",I.gift,"Lista de presentes",`${giftsCount} item(ns) na lista`)}
+      ${sectionCard("polls",I.poll,"Enquetes",`${activePolls} enquete(s) ativa(s)`)}
+      ${sectionCard("supplies",I.box,"Lista de insumos",`${state.supplies.length} insumo(s) · ${suppliesFilled}/${suppliesNeeded} vaga(s)`)}
+    </div>
+
+    <h2 class="section-title" style="font-size:23px;margin:38px 0 18px;">Detalhes &amp; gestão</h2>
+    <div class="metrics">
+      ${metric(I.users,"#2A6FDB",total,"Total de convidados")}
+      ${metric(I.check,"#1F8A5B",confirmed,"Confirmados")}
+      ${metric(I.gift,"var(--accent)",giftsCount,"Presentes registrados")}
+      ${metric(I.poll,"#7A5AE0",activePolls,"Enquetes ativas")}
+    </div>
+
+    <!-- Tabela de convidados -->
+    <div class="row-between" style="margin-bottom:14px;">
+      <h2 class="section-title" style="font-size:21px;">Convidados</h2>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Nome</th><th>E-mail</th><th>Acomp.</th><th>Status</th><th>Lista pública</th><th></th></tr></thead>
+        <tbody>
+          ${state.guests.map(g => `
+            <tr>
+              <td style="font-weight:700;"><div style="display:flex;align-items:center;gap:10px;"><span class="avatar" style="width:30px;height:30px;font-size:12px;background:${avatarColor(g.name)}">${initials(g.name)}</span>${esc(g.name)}</div></td>
+              <td class="muted">${esc(g.email)}</td>
+              <td>${g.companions}</td>
+              <td>${g.status==="confirmed"?`<span class="tag confirmed">Confirmado</span>`:`<span class="tag pending">Pendente</span>`}</td>
+              <td>${g.visible?`<span class="tag vis">Visível</span>`:`<span class="tag hid">Oculto</span>`}</td>
+              <td style="text-align:right;"><button class="icon-btn" title="Remover" onclick="removeGuest(${g.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></td>
+            </tr>`).join("")}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Presentes -->
+    <div class="admin-block">
+      <div class="row-between" style="margin-bottom:14px;">
+        <h2 class="section-title" style="font-size:21px;">Lista de presentes</h2>
+        <button class="btn sm" onclick="toggleGiftForm()">+ Sugerir presente</button>
+      </div>
+      <div class="inline-form hidden" id="gift-form">
+        <input type="text" id="new-gift" placeholder="Sugestão de presente" onkeydown="if(event.key==='Enter')addGift()" />
+        <button class="btn sm" onclick="addGift()">Adicionar sugestão</button>
+        <button class="btn secondary sm" onclick="toggleGiftForm()">Cancelar</button>
+      </div>
+      <div style="margin-top:14px;">
+        ${state.gifts.map(g => {
+          const bring = giftBeingBrought(g);
+          const tag = g.source==="guest"
+            ? `<span class="gtag mine"><span class="d"></span>Convidado vai levar</span>`
+            : bring
+              ? `<span class="gtag bring"><span class="d"></span>Alguém vai levar</span>`
+              : `<span class="gtag suggest"><span class="d"></span>Sugestão</span>`;
+          return `
+          <div class="admin-list-item">
+            ${tag}
+            <span class="ali-name">${esc(g.name)}</span>
+            <span class="spacer"></span>
+            <button class="icon-btn" title="Remover" onclick="removeGift(${g.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+          </div>`; }).join("")}
+      </div>
+    </div>
+
+    <!-- Enquetes -->
+    <div class="admin-block">
+      <div class="row-between" style="margin-bottom:14px;">
+        <h2 class="section-title" style="font-size:21px;">Enquetes</h2>
+        <button class="btn sm" onclick="togglePollBuilder()">+ Nova enquete</button>
+      </div>
+      <div class="poll-builder" id="poll-builder">
+        <input type="text" id="pb-q" placeholder="Pergunta da enquete" />
+        <div class="opt-inputs">
+          <input type="text" class="pb-opt" placeholder="Opção 1" />
+          <input type="text" class="pb-opt" placeholder="Opção 2" />
+          <input type="text" class="pb-opt" placeholder="Opção 3 (opcional)" />
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn sm" onclick="createPoll()">Criar enquete</button>
+          <button class="btn secondary sm" onclick="togglePollBuilder()">Cancelar</button>
+        </div>
+      </div>
+      <div style="margin-top:14px;">
+        ${state.polls.map(p => {
+          const total = p.options.reduce((n,o)=>n+o.votes,0);
+          return `
+          <div class="card pad" style="margin-bottom:12px;">
+            <div class="row-between" style="margin-bottom:6px;">
+              <div style="font-weight:700;">${esc(p.question)} ${p.active?'<span class="tag confirmed" style="margin-left:6px;">Ativa</span>':'<span class="tag hid" style="margin-left:6px;">Encerrada</span>'}</div>
+              ${p.active?`<button class="btn secondary sm" onclick="closePoll(${p.id})">Encerrar</button>`:''}
+            </div>
+            <div class="muted" style="font-size:13.5px;">${p.options.map(o=>`${esc(o.label)} (${o.votes})`).join(" · ")} — ${total} voto(s)</div>
+          </div>`;
+        }).join("")}
+      </div>
+    </div>
+
+    <!-- Insumos -->
+    <div class="admin-block">
+      <div class="row-between" style="margin-bottom:6px;">
+        <h2 class="section-title" style="font-size:21px;">Lista de insumos</h2>
+        <button class="btn sm" onclick="toggleSupplyForm()">+ Adicionar insumo</button>
+      </div>
+      <p class="muted" style="font-size:13.5px;margin-bottom:14px;">Itens que precisam ser levados. Defina quantas pessoas devem levar cada um.</p>
+
+      <label class="supply-suggest-row" onclick="event.preventDefault();toggleSupplySuggest()">
+        <div>
+          <div class="ssr-title">Permitir sugestões dos convidados</div>
+          <div class="ssr-sub">Quando ligado, convidados podem adicionar novos insumos à lista.</div>
+        </div>
+        <span class="switch"><input type="checkbox" ${activeEv().supplySuggest?"checked":""} /><span class="slider"></span></span>
+      </label>
+
+      <div class="inline-form hidden" id="supply-form">
+        <input type="text" id="new-supply" placeholder="Nome do insumo (ex.: Gelo)" onkeydown="if(event.key==='Enter')addSupply()" />
+        <div class="supply-need">
+          <span>Pessoas necessárias</span>
+          <input type="number" id="new-supply-qty" min="1" max="20" value="1" />
+        </div>
+        <button class="btn sm" onclick="addSupply()">Adicionar</button>
+        <button class="btn secondary sm" onclick="toggleSupplyForm()">Cancelar</button>
+      </div>
+
+      <div style="margin-top:14px;">
+        ${state.supplies.length ? state.supplies.map(s => {
+          const filled = Math.min(s.takenBy.length, s.needed);
+          const done = s.takenBy.length >= s.needed;
+          return `
+          <div class="admin-list-item">
+            <span class="gtag ${done?'bring':'suggest'}"><span class="d"></span>${filled}/${s.needed} pessoa(s)</span>
+            <span class="ali-name">${esc(s.name)}${s.source==="guest"?` <span class="gtag mine" style="margin-left:6px;"><span class="d"></span>sugerido</span>`:""}</span>
+            <span class="spacer"></span>
+            <button class="icon-btn" title="Remover" onclick="removeSupply(${s.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+          </div>`; }).join("") : `<p class="muted" style="font-size:14px;">Nenhum insumo cadastrado ainda.</p>`}
+      </div>
+    </div>`;
+}
+
+/* ── ações admin · insumos ── */
+function toggleSupplyForm(){ const f=$("#supply-form"); f.classList.toggle("hidden"); if(!f.classList.contains("hidden")) $("#new-supply").focus(); }
+function addSupply(){
+  const name=$("#new-supply").value.trim(); if(!name) return;
+  const needed=Math.max(1, parseInt($("#new-supply-qty").value,10)||1);
+  state.supplies.push({ id:Date.now(), name, needed, takenBy:[], source:"admin" }); // SUPABASE: inserir insumo
+  renderManage();
+}
+function removeSupply(id){ state.supplies = state.supplies.filter(s=>s.id!==id); renderManage(); } // SUPABASE: remover insumo
+function toggleSupplySuggest(){ activeEv().supplySuggest = !activeEv().supplySuggest; renderManage(); } // SUPABASE: atualizar flag de sugestões
+Object.assign(window,{toggleSupplyForm,addSupply,removeSupply,toggleSupplySuggest});
+
+/* ações admin */
+function removeGuest(id){
+  state.guests = state.guests.filter(g=>g.id!==id); // SUPABASE: remover convidado
+  renderManage();
+}
+function toggleGiftForm(){ const f=$("#gift-form"); f.classList.toggle("hidden"); if(!f.classList.contains("hidden")) $("#new-gift").focus(); }
+function addGift(){
+  const inp=$("#new-gift"); const name=inp.value.trim(); if(!name) return;
+  state.gifts.push({ id:Date.now(), name, source:"admin", claimed:false, byMe:false }); // SUPABASE: inserir sugestão de presente
+  renderManage();
+}
+function removeGift(id){ state.gifts = state.gifts.filter(g=>g.id!==id); renderManage(); } // SUPABASE: remover presente
+function togglePollBuilder(){ const b=$("#poll-builder"); b.classList.toggle("show"); if(b.classList.contains("show")) $("#pb-q").focus(); }
+function createPoll(){
+  const q=$("#pb-q").value.trim();
+  const opts=$$(".pb-opt").map(i=>i.value.trim()).filter(Boolean);
+  if(!q || opts.length<2){ alert("Informe a pergunta e ao menos 2 opções."); return; }
+  state.polls.push({ id:Date.now(), question:q, active:true, userVote:null,
+    options:opts.map((label,i)=>({id:"o"+i, label, votes:0})) }); // SUPABASE: inserir enquete
+  renderManage();
+}
+function closePoll(id){ const p=state.polls.find(x=>x.id===id); if(p) p.active=false; renderManage(); } // SUPABASE: encerrar enquete
+Object.assign(window,{removeGuest,toggleGiftForm,addGift,removeGift,togglePollBuilder,createPoll,closePoll});
+
+/* ════════════ TWEAKS (host protocol em vanilla JS) ════════════ */
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "corners": "rounded",
+  "accent": "#E8553A",
+  "titleFont": "Bricolage Grotesque",
+  "density": "comfortable"
+}/*EDITMODE-END*/;
+
+const ACCENTS = [
+  {v:"#E8553A", ink:"#ffffff"},
+  {v:"#E84C82", ink:"#ffffff"},
+  {v:"#F2A93B", ink:"#3a2400"},
+  {v:"#7A5AE0", ink:"#ffffff"},
+  {v:"#1F8A5B", ink:"#ffffff"}
+];
+
+function applyTweaks(t){
+  const root = document.documentElement.style;
+  // cantos
+  if (t.corners === "sharp"){
+    root.setProperty("--radius","4px"); root.setProperty("--radius-sm","3px"); root.setProperty("--radius-pill","4px");
+  } else {
+    root.setProperty("--radius","18px"); root.setProperty("--radius-sm","12px"); root.setProperty("--radius-pill","999px");
+  }
+  // accent
+  const a = ACCENTS.find(x=>x.v===t.accent) || ACCENTS[0];
+  root.setProperty("--accent", a.v);
+  root.setProperty("--accent-ink", a.ink);
+  // title font
+  root.setProperty("--title-font", `"${t.titleFont}"`);
+  // densidade
+  document.body.classList.toggle("density-compact", t.density==="compact");
+  // sync controls UI
+  $$("#tw-corners button").forEach(b=>b.classList.toggle("on", b.dataset.v===t.corners));
+  $$("#tw-accent .swatch").forEach(s=>s.classList.toggle("on", s.dataset.v===t.accent));
+  $$("#tw-density button").forEach(b=>b.classList.toggle("on", b.dataset.v===t.density));
+  $("#tw-font").value = t.titleFont;
+}
+
+const tweaks = { ...TWEAK_DEFAULTS };
+function setTweak(key, val){
+  tweaks[key] = val;
+  applyTweaks(tweaks);
+  window.parent.postMessage({ type:"__edit_mode_set_keys", edits:{ [key]:val } }, "*");
+}
+
+/* build accent swatches */
+$("#tw-accent").innerHTML = ACCENTS.map(a=>`<div class="swatch" data-v="${a.v}" style="background:${a.v}"></div>`).join("");
+$$("#tw-accent .swatch").forEach(s=>s.addEventListener("click",()=>setTweak("accent",s.dataset.v)));
+$$("#tw-corners button").forEach(b=>b.addEventListener("click",()=>setTweak("corners",b.dataset.v)));
+$$("#tw-density button").forEach(b=>b.addEventListener("click",()=>setTweak("density",b.dataset.v)));
+$("#tw-font").addEventListener("change",e=>setTweak("titleFont",e.target.value));
+
+/* host protocol */
+const panel = $("#tweaks");
+window.addEventListener("message",(e)=>{
+  const t=e?.data?.type;
+  if (t==="__activate_edit_mode") panel.classList.add("open");
+  else if (t==="__deactivate_edit_mode") panel.classList.remove("open");
+});
+$("#tw-close").addEventListener("click",()=>{
+  panel.classList.remove("open");
+  window.parent.postMessage({ type:"__edit_mode_dismissed" }, "*");
+});
+window.parent.postMessage({ type:"__edit_mode_available" }, "*");
+
+/* draggable panel */
+(function(){
+  const head=$("#tw-head"); let sx,sy,sr,sb;
+  head.addEventListener("mousedown",(e)=>{
+    if(e.target.closest(".tw-x")) return;
+    const r=panel.getBoundingClientRect();
+    sx=e.clientX; sy=e.clientY; sr=window.innerWidth-r.right; sb=window.innerHeight-r.bottom;
+    const move=(ev)=>{ panel.style.right=Math.max(8,sr-(ev.clientX-sx))+"px"; panel.style.bottom=Math.max(8,sb-(ev.clientY-sy))+"px"; };
+    const up=()=>{ window.removeEventListener("mousemove",move); window.removeEventListener("mouseup",up); };
+    window.addEventListener("mousemove",move); window.addEventListener("mouseup",up);
+  });
+})();
+
+/* ════════════ INIT ════════════ */
+// confete decorativo na arte de login
+(function(){
+  const wrap = $("#login-confetti"); if(!wrap) return;
+  const cols=["#fff","rgba(255,255,255,.7)","#FFD9A0","#FFC2D4","#fff","rgba(255,255,255,.55)"];
+  let html="";
+  for(let i=0;i<26;i++){
+    const top=Math.random()*100, left=Math.random()*100, rot=Math.random()*360;
+    const w=5+Math.random()*7, h=5+Math.random()*9, c=cols[i%cols.length];
+    html+=`<i style="top:${top}%;left:${left}%;width:${w}px;height:${h}px;background:${c};transform:rotate(${rot}deg)"></i>`;
+  }
+  wrap.innerHTML=html;
+})();
+applyTweaks(tweaks);
+renderAccount();
+showScreen("screen-login");
+</script>
+</body>
+</html>
