@@ -3,12 +3,9 @@
 Template **Next.js 14 fullstack** para gerenciar eventos pessoais e aniversários,
 feito para ser **clonado e self-hosted por qualquer pessoa**. Crie um evento, monte o
 RSVP, mostre a lista de presença pública, gerencie uma lista de presentes anônima e
-crie enquetes — **sem contas de usuário, sem provedor de e-mail pago e sem lock-in de
-fornecedor**.
+crie enquetes.
 
-> Esta é a camada **open-source** do EventBday (modelo open-core). Ela **não inclui**
-> envio de e-mail, autenticação de usuário, lembretes agendados nem dashboard
-> multi-conta — esses recursos pertencem à camada SaaS privada.
+> Esta é a camada **open-source** do EventBday (modelo open-core).
 
 ## ✨ Como funciona o acesso (sem login)
 
@@ -26,8 +23,8 @@ Como cada instância self-hosted serve um único organizador, a chave única por
 ### Fluxo de confirmação sem e-mail
 1. O convidado preenche o formulário público de RSVP.
 2. Uma Server Action grava o convidado e gera um `token` único.
-3. A própria tela exibe o **link de acesso do convidado** com um botão de copiar — é
-   responsabilidade do convidado salvar o link (não há reenvio automático por e-mail).
+3. A própria tela exibe o **link de acesso do convidado** com um botão de copiar — esse
+   mesmo link pode ser recuperado através do painel do organizador.
 
 ## 🧱 Stack
 
@@ -37,10 +34,8 @@ Como cada instância self-hosted serve um único organizador, a chave única por
 | Linguagem | TypeScript |
 | Backend | Next.js Server Actions (`'use server'`) |
 | Banco de dados | **PostgreSQL puro** (qualquer provedor) via [`postgres`](https://github.com/porsager/postgres) |
-| ORM | Nenhum — SQL direto |
 | Acesso do organizador | `ADMIN_TOKEN` (variável de ambiente) |
 | Acesso do convidado | Token único por linha em `guests` |
-| E-mail | **Nenhum** |
 | Validação | Zod |
 | Estilo | CSS customizado (sem framework de UI) |
 
@@ -59,7 +54,9 @@ npm install
 ```
 
 ### 3. Configurar variáveis de ambiente
+
 Copie o exemplo e preencha:
+
 ```bash
 cp .env.example .env.local
 ```
@@ -75,20 +72,67 @@ ADMIN_TOKEN=uma-chave-secreta-bem-longa
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
 ```
 
-> Não há variáveis de e-mail (`RESEND_API_KEY`) nem de provedor de auth gerenciado
-> (`SUPABASE_*`, `NEXTAUTH_*`).
+### 4. Criar o banco de dados
 
-### 4. Aplicar o schema no banco
-As migrations são **SQL puro** em [`db/migrations/`](db/migrations). Aplique com o script incluído:
+O EventBday **não cria o banco automaticamente** — apenas as tabelas dentro dele. O
+banco indicado em `DATABASE_URL` (`eventbday`, no exemplo acima) precisa existir
+*antes* de rodar as migrations.
+
+Escolha o caminho que combina com o seu setup:
+
+**Opção A — PostgreSQL via Docker (recomendado para rodar localmente)**
+
+```bash
+docker run --name eventbday-db \
+  -e POSTGRES_USER=usuario \
+  -e POSTGRES_PASSWORD=senha \
+  -e POSTGRES_DB=eventbday \
+  -p 5432:5432 \
+  -v eventbday-data:/var/lib/postgresql/data \
+  -d postgres:16
+```
+
+A variável `POSTGRES_DB` já cria o banco `eventbday` automaticamente na primeira
+inicialização do container — nenhum passo extra é necessário. Ajuste `usuario` e
+`senha` para baterem com o `DATABASE_URL` do passo anterior.
+
+**Opção B — PostgreSQL já existente (local, Supabase, Railway, Neon, etc.)**
+
+Se você já tem uma instância Postgres rodando mas o banco `eventbday` ainda não
+existe nela, crie com um único comando:
+
+```bash
+psql "postgres://usuario:senha@localhost:5432/postgres" -c "CREATE DATABASE eventbday;"
+```
+
+> Conecte-se ao banco padrão (`postgres`) para poder criar o banco `eventbday` — não
+> é possível criar um banco estando conectado a ele mesmo. Em provedores gerenciados
+> (Supabase, Railway, Neon), o banco geralmente já vem criado por padrão — nesse
+> caso, apenas ajuste `DATABASE_URL` com o nome do banco fornecido pelo provedor e
+> pule este passo.
+
+### 5. Aplicar o schema no banco
+
+Com o banco já existente, aplique as migrations. As migrations são **SQL puro** em
+[`db/migrations/`](db/migrations). Aplique com o script incluído:
+
 ```bash
 npm run db:migrate
 ```
+
 Ou rode o SQL manualmente no seu cliente Postgres:
+
 ```bash
 psql "$DATABASE_URL" -f db/migrations/001_initial_schema.sql
 ```
 
-### 5. Iniciar em desenvolvimento
+> Se o `psql` retornar um erro de conexão via socket Unix (`/var/run/postgresql/...`),
+> confirme que `DATABASE_URL` especifica o host explicitamente
+> (`localhost:5432`, não apenas `/banco`) — sem isso o `psql` tenta usar socket local
+> em vez de TCP, o que falha quando o Postgres roda em Docker.
+
+### 6. Iniciar em desenvolvimento
+
 ```bash
 npm run dev
 # http://localhost:3000
